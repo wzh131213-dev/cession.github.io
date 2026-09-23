@@ -1,0 +1,4692 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>梦幻西游 · 单机版</title>
+<style>
+/* ============================================================
+   梦幻西游 · Q版像素单机  —— 第 1 批
+   全局重置 / 木纹面板 / 顶部状态栏
+   ============================================================ */
+:root{
+  --wood-dark:#2a1608;
+  --wood:#5a3218;
+  --wood-lt:#8a5228;
+  --wood-hl:#a86a34;
+  --gold:#f0c860;
+  --gold-dk:#a87828;
+  --gold-lt:#ffe8a0;
+  --jade:#4a9a7a;
+  --jade-dk:#2a6a52;
+  --red:#c03030;
+  --red-dk:#801818;
+  --blue:#3a70c0;
+  --blue-dk:#1a4080;
+  --purple:#8050b0;
+  --paper:#f0e0b8;
+  --ink:#2a1a0a;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{
+  height:100%;overflow:hidden;
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Heiti SC",sans-serif;
+  font-size:12px;
+  background:#0a0604;
+  color:#f0e0b8;
+  display:flex;justify-content:center;
+  user-select:none;
+  -webkit-font-smoothing:antialiased;
+}
+#game{
+  width:100%;max-width:640px;
+  height:100vh;height:100dvh;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+  background:#1a0e08;
+  box-shadow:0 0 80px rgba(0,0,0,.95);
+}
+
+/* ================= 通用木纹面板 ================= */
+.wood{
+  background:
+    repeating-linear-gradient(92deg,
+      rgba(0,0,0,.10) 0 2px,
+      rgba(255,220,160,.03) 2px 5px,
+      transparent 5px 9px),
+    linear-gradient(180deg,#6b3a1a 0%,#4a2812 55%,#3a1f0e 100%);
+  border:2px solid var(--wood-dark);
+  border-radius:6px;
+  box-shadow:
+    inset 0 0 0 1px rgba(240,200,120,.22),
+    inset 0 2px 4px rgba(255,220,160,.12),
+    inset 0 -4px 8px rgba(0,0,0,.5),
+    0 3px 8px rgba(0,0,0,.55);
+  position:relative;
+}
+.wood::after{
+  content:'';position:absolute;inset:3px;
+  border:1px solid rgba(240,200,120,.16);
+  border-radius:4px;pointer-events:none;
+}
+
+/* ================= 金色镶边面板 ================= */
+.gold-frame{
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.08) 0 2px,
+      transparent 2px 6px),
+    linear-gradient(180deg,#5a3218,#3a1f0e);
+  border:3px solid var(--gold-dk);
+  border-radius:8px;
+  box-shadow:
+    inset 0 0 0 1px var(--gold),
+    inset 0 0 24px rgba(240,200,96,.12),
+    0 4px 16px rgba(0,0,0,.65);
+  position:relative;
+}
+.gold-frame::before{
+  content:'';position:absolute;inset:4px;
+  border:1px dashed rgba(240,200,96,.35);
+  border-radius:5px;pointer-events:none;
+}
+
+/* 金色卷轴标题 */
+.scroll-title{
+  display:inline-block;
+  padding:3px 22px;
+  font-size:12px;letter-spacing:4px;
+  color:#3a1f0e;
+  font-weight:bold;
+  background:linear-gradient(180deg,var(--gold-lt),var(--gold),var(--gold-dk));
+  border:2px solid #6a4810;
+  border-radius:12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.7),
+    inset 0 -2px 4px rgba(120,80,20,.4),
+    0 2px 5px rgba(0,0,0,.5);
+  text-shadow:0 1px 0 rgba(255,255,255,.5);
+  position:relative;
+}
+.scroll-title::before,
+.scroll-title::after{
+  content:'❖';
+  position:absolute;top:50%;transform:translateY(-50%);
+  font-size:9px;color:#6a4810;
+}
+.scroll-title::before{left:6px}
+.scroll-title::after{right:6px}
+
+/* ================= 顶部状态栏 ================= */
+#topbar{
+  flex-shrink:0;z-index:30;
+  display:flex;align-items:stretch;gap:4px;
+  padding:5px 6px 5px;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.15) 0 2px,
+      transparent 2px 6px),
+    linear-gradient(180deg,#5a3218,#2a1608);
+  border-bottom:3px solid #140a04;
+  box-shadow:
+    0 3px 0 rgba(0,0,0,.4),
+    0 4px 10px rgba(0,0,0,.6),
+    inset 0 1px 0 rgba(240,200,96,.25);
+}
+
+/* 头像框 */
+#portrait{
+  width:58px;height:64px;flex-shrink:0;
+  background:linear-gradient(180deg,#6b3a18,#3a1f0e);
+  border:2px solid var(--gold-dk);
+  border-radius:5px;
+  box-shadow:
+    inset 0 0 0 1px rgba(240,200,96,.55),
+    inset 0 0 12px rgba(0,0,0,.6),
+    0 2px 5px rgba(0,0,0,.5);
+  display:flex;align-items:flex-end;justify-content:center;
+  overflow:hidden;position:relative;
+}
+#portrait svg{width:100%;height:100%;display:block}
+#portrait::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  box-shadow:0 0 6px var(--gold);
+}
+
+/* 中段信息区 */
+.info-mid{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;gap:3px;
+  justify-content:center;
+}
+.name-row{
+  display:flex;align-items:center;gap:5px;
+  min-width:0;
+}
+#pName{
+  font-size:13px;font-weight:bold;
+  color:var(--gold-lt);
+  letter-spacing:.5px;
+  text-shadow:0 1px 0 #000,0 0 8px rgba(240,200,96,.5);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:92px;
+}
+#pSect{
+  font-size:10px;color:#fff;
+  padding:1px 7px;border-radius:9px;
+  background:linear-gradient(180deg,var(--jade),var(--jade-dk));
+  border:1px solid #163a2a;
+  box-shadow:
+    0 1px 0 rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.3);
+  white-space:nowrap;
+  text-shadow:0 1px 0 rgba(0,0,0,.4);
+}
+#pLv{
+  font-size:10px;color:var(--gold);
+  margin-left:auto;
+  text-shadow:0 1px 0 #000;
+  white-space:nowrap;
+}
+#pLv b{color:#fff;font-size:11px}
+
+/* 三条状态条 */
+.bars{
+  display:flex;flex-direction:column;gap:3px;
+}
+.sbar{
+  height:11px;position:relative;
+  background:#180c04;
+  border:1px solid #060302;
+  border-radius:6px;
+  box-shadow:
+    inset 0 2px 3px rgba(0,0,0,.85),
+    inset 0 -1px 0 rgba(255,220,160,.08);
+  overflow:hidden;
+}
+.sbar .fill{
+  height:100%;width:0;
+  border-radius:5px;
+  transition:width .3s ease;
+  position:relative;
+}
+.sbar .fill::after{
+  content:'';position:absolute;inset:0;
+  border-radius:5px;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,.45) 0%,
+    rgba(255,255,255,.1) 40%,
+    transparent 55%,
+    rgba(0,0,0,.25) 100%);
+}
+.sbar.hp .fill{
+  background:linear-gradient(90deg,#8a1010,#d02828 45%,#ff6050);
+  box-shadow:0 0 6px rgba(224,48,48,.6);
+}
+.sbar.mp .fill{
+  background:linear-gradient(90deg,#0a2090,#2a60d8 45%,#60a0ff);
+  box-shadow:0 0 6px rgba(48,112,224,.6);
+}
+.sbar.exp .fill{
+  background:linear-gradient(90deg,#906010,#e0a820 45%,#ffe070);
+  box-shadow:0 0 6px rgba(240,184,48,.6);
+}
+.sbar .label{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 6px;
+  font-size:8.5px;color:#fff;
+  text-shadow:0 1px 2px #000;
+  letter-spacing:.3px;
+  pointer-events:none;
+  font-weight:bold;
+}
+.sbar .label i{font-style:normal;color:#ffe8a0;font-weight:normal}
+
+/* 金币框 */
+#goldBox{
+  flex-shrink:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:0 7px;
+  border-left:1px solid rgba(240,200,96,.22);
+  margin-left:1px;
+}
+#goldBox .g-icon{
+  font-size:17px;line-height:1;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));
+}
+#goldBox .g-val{
+  font-size:11px;font-weight:bold;
+  color:var(--gold-lt);
+  text-shadow:0 1px 0 #000,0 0 5px rgba(240,200,96,.6);
+  white-space:nowrap;
+  margin-top:1px;
+}
+#goldBox .g-val small{font-size:9px;color:#f0c860;font-weight:normal}
+
+/* 状态图标行（气血/魔法小图标） */
+.status-icons{
+  display:flex;gap:6px;align-items:center;
+  font-size:9px;color:#c0a870;
+  margin-top:1px;
+}
+.status-icons span{
+  display:flex;align-items:center;gap:2px;
+  text-shadow:0 1px 0 #000;
+}
+
+/* ============================================================
+   ↓↓↓ 第 1 批结束，第 2 批将接续：主视图区 / 地形块 / 玩家角色
+   ============================================================ */
+
+
+/* ===== 修复：第2/3批 CSS 已合并到同一个 style ===== */
+/* ============================================================
+   梦幻西游 · Q版像素单机  —— 第 2 批
+   主视图区 / 地形块 / 玩家角色 / 场景HUD / 方向键
+   ============================================================ */
+
+/* ================= 主视图区 ================= */
+#stage{
+  flex:1;position:relative;overflow:hidden;
+  background:#0a1a08;
+  z-index:10;
+}
+
+/* 世界层：所有格子+角色都在这层 */
+#world{
+  position:absolute;inset:0;
+  overflow:hidden;
+}
+
+/* ================= 地形块 ================= */
+.tile{
+  position:absolute;
+  box-sizing:border-box;
+  image-rendering:pixelated;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;line-height:1;
+  will-change:transform;
+}
+
+/* 草地（两种明度交错，制造像素草地感） */
+.t-grass{
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(0,0,0,.04) 0 4px,
+      transparent 4px 8px),
+    linear-gradient(180deg,#5aa044,#4a8836);
+}
+.t-grass2{
+  background:
+    repeating-linear-gradient(-45deg,
+      rgba(0,0,0,.05) 0 4px,
+      transparent 4px 8px),
+    linear-gradient(180deg,#4a8836,#3a7028);
+}
+
+/* 土路 */
+.t-path{
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.06) 0 3px,
+      transparent 3px 7px),
+    linear-gradient(180deg,#c8a878,#b09060);
+}
+
+/* 水面 */
+.t-water{
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,.10) 0 2px,
+      transparent 2px 6px),
+    linear-gradient(180deg,#4a80c0,#2a5a98);
+  animation:waterFlow 3s ease-in-out infinite;
+}
+.t-water2{
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,.08) 2px 4px,
+      transparent 4px 8px),
+    linear-gradient(180deg,#3a70b0,#205088);
+  animation:waterFlow 3.5s ease-in-out infinite reverse;
+}
+@keyframes waterFlow{
+  0%,100%{filter:brightness(1)}
+  50%{filter:brightness(1.15)}
+}
+
+/* 树木（深绿底 + 树冠emoji） */
+.t-tree{
+  background:
+    radial-gradient(circle at 50% 40%,#3a7a2a 0%,#2a5a1e 70%,#1e4416 100%);
+}
+.t-tree .deco{font-size:24px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+
+/* 岩石 */
+.t-rock{
+  background:
+    radial-gradient(circle at 35% 30%,#a0a098 0%,#80807a 55%,#5a5a54 100%);
+}
+.t-rock .deco{font-size:20px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+
+/* 沙地 */
+.t-sand{
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(0,0,0,.03) 0 5px,
+      transparent 5px 10px),
+    linear-gradient(180deg,#e8d0a0,#d0b880);
+}
+
+/* 雪地 */
+.t-snow{
+  background:
+    radial-gradient(circle at 30% 25%,#ffffff 0%,#e0eef8 50%,#c8dce8 100%);
+}
+
+/* 木桥 */
+.t-bridge{
+  background:
+    repeating-linear-gradient(0deg,
+      #8a5a30 0 8px,
+      #6a4020 8px 9px);
+  box-shadow:inset 0 0 0 2px #4a2810;
+}
+
+/* 建筑：墙 / 屋顶 / 地板 */
+.t-wall{
+  background:
+    repeating-linear-gradient(0deg,
+      #9a8060 0 12px,
+      #7a6040 12px 14px),
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.08) 0 20px,
+      transparent 20px 22px);
+  box-shadow:inset 0 0 0 2px #4a3820;
+}
+.t-roof{
+  background:
+    repeating-linear-gradient(90deg,
+      #b84030 0 10px,
+      #a03020 10px 12px);
+  box-shadow:inset 0 0 0 2px #601810;
+}
+.t-floor{
+  background:
+    repeating-linear-gradient(0deg,
+      #c8a878 0 14px,
+      #b09060 14px 15px),
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.05) 0 14px,
+      transparent 14px 15px);
+}
+
+/* 花丛 */
+.t-flower{
+  background:linear-gradient(180deg,#5aa04a,#3a8028);
+}
+.t-flower .deco{font-size:18px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
+
+/* 岩浆（火山） */
+.t-lava{
+  background:
+    radial-gradient(circle at 50% 50%,#ff8020 0%,#e04010 40%,#a01808 100%);
+  animation:lavaPulse 1.5s ease-in-out infinite;
+}
+@keyframes lavaPulse{
+  0%,100%{filter:brightness(1)}
+  50%{filter:brightness(1.35)}
+}
+
+/* 虚空 */
+.t-void{
+  background:
+    radial-gradient(circle at 50% 50%,#2a2a44 0%,#14142a 70%,#08081a 100%);
+}
+
+/* 建筑装饰图标 */
+.tile .build{
+  font-size:24px;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));
+}
+.tile .npc{
+  font-size:22px;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));
+  animation:npcIdle 2s ease-in-out infinite;
+}
+@keyframes npcIdle{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-2px)}
+}
+
+/* ================= 玩家角色 ================= */
+#player{
+  position:absolute;z-index:15;
+  width:44px;height:54px;
+  pointer-events:none;
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.6));
+  transition:left .12s linear,top .12s linear;
+}
+#player svg{width:100%;height:100%;display:block}
+#player.walking{
+  animation:playerWalk .35s steps(2) infinite;
+}
+@keyframes playerWalk{
+  0%,100%{transform:translateY(0) scaleY(1)}
+  50%{transform:translateY(-3px) scaleY(.97)}
+}
+
+/* 玩家脚下光圈 */
+#player::after{
+  content:'';position:absolute;left:50%;bottom:-2px;
+  width:34px;height:10px;
+  transform:translateX(-50%);
+  background:radial-gradient(ellipse,rgba(240,200,96,.55),rgba(240,200,96,0) 70%);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+/* ================= 名字标签 ================= */
+.name-tag{
+  position:absolute;
+  font-size:10px;font-weight:bold;
+  color:#fff;
+  white-space:nowrap;
+  transform:translateX(-50%);
+  pointer-events:none;
+  z-index:16;
+  text-shadow:
+    0 1px 0 #000,
+    1px 0 0 #000,
+    -1px 0 0 #000,
+    0 -1px 0 #000,
+    0 0 4px rgba(0,0,0,.8);
+  letter-spacing:.3px;
+}
+.name-tag.npc{color:#ffe070}
+.name-tag.mob{color:#ff8060}
+.name-tag.shop{color:#80d0ff}
+.name-tag.boss{color:#ff5050;font-size:11px}
+
+/* ================= 场景标题 ================= */
+#sceneTitle{
+  position:absolute;top:10px;left:50%;
+  transform:translateX(-50%);
+  z-index:12;
+  padding:4px 20px;
+  background:
+    linear-gradient(180deg,rgba(58,31,16,.95),rgba(26,14,8,.95));
+  border:2px solid var(--gold-dk);
+  border-radius:15px;
+  box-shadow:
+    inset 0 0 0 1px rgba(240,200,96,.45),
+    inset 0 1px 0 rgba(255,255,255,.1),
+    0 3px 8px rgba(0,0,0,.65);
+  font-size:11px;
+  color:var(--gold-lt);
+  letter-spacing:2px;
+  text-shadow:0 1px 0 #000;
+  pointer-events:none;
+  white-space:nowrap;
+}
+#sceneTitle b{color:#fff;font-weight:bold}
+#sceneTitle i{
+  font-style:normal;color:#90c8a0;
+  margin-left:5px;font-size:10px;
+}
+
+/* ================= 小地图按钮 ================= */
+#miniMapBtn{
+  position:absolute;top:10px;right:10px;
+  z-index:14;
+  width:46px;height:46px;
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(0,0,0,.1) 0 2px,
+      transparent 2px 4px),
+    linear-gradient(180deg,#7a4a20,#4a2812);
+  border:2px solid var(--gold-dk);
+  border-radius:7px;
+  box-shadow:
+    inset 0 0 0 1px rgba(240,200,96,.5),
+    inset 0 1px 0 rgba(255,255,255,.15),
+    0 3px 7px rgba(0,0,0,.55);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:all .08s;
+}
+#miniMapBtn:active{
+  transform:translateY(1px);
+  box-shadow:
+    inset 0 0 0 1px rgba(240,200,96,.5),
+    inset 0 2px 4px rgba(0,0,0,.5),
+    0 1px 3px rgba(0,0,0,.55);
+}
+#miniMapBtn .mi{
+  font-size:18px;line-height:1;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));
+}
+#miniMapBtn .mt{
+  font-size:8px;color:var(--gold-lt);
+  margin-top:2px;letter-spacing:.5px;
+  text-shadow:0 1px 0 #000;
+}
+
+/* ================= 方向键 ================= */
+#dpad{
+  position:absolute;right:12px;bottom:12px;
+  z-index:18;
+  display:grid;
+  grid-template-columns:repeat(3,46px);
+  grid-template-rows:repeat(3,46px);
+  gap:3px;
+}
+#dpad button{
+  font-family:inherit;
+  font-size:22px;font-weight:bold;
+  color:#ffe8a0;
+  padding:0;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(0,0,0,.08) 0 2px,
+      transparent 2px 4px),
+    linear-gradient(180deg,#8a5228,#5a3218);
+  border:2px solid #2a1608;
+  border-radius:7px;
+  box-shadow:
+    inset 0 1px 0 rgba(240,200,96,.45),
+    inset 0 -2px 3px rgba(0,0,0,.4),
+    0 3px 0 #140a04,
+    0 4px 7px rgba(0,0,0,.55);
+  cursor:pointer;
+  transition:all .06s;
+  text-shadow:0 1px 0 #000,0 0 6px rgba(240,200,96,.4);
+  -webkit-user-select:none;
+}
+#dpad button:active{
+  transform:translateY(3px);
+  box-shadow:
+    inset 0 1px 0 rgba(240,200,96,.45),
+    inset 0 -1px 2px rgba(0,0,0,.4),
+    0 0 0 #140a04,
+    0 1px 3px rgba(0,0,0,.55);
+}
+#dpad .u{grid-column:2;grid-row:1}
+#dpad .l{grid-column:1;grid-row:2}
+#dpad .c{
+  grid-column:2;grid-row:2;
+  font-size:14px;
+  background:
+    radial-gradient(circle at 50% 35%,#a05830,#5a3218);
+  color:#ffe070;
+}
+#dpad .r{grid-column:3;grid-row:2}
+#dpad .d{grid-column:2;grid-row:3}
+
+/* ================= 场景浮动提示 ================= */
+#toast{
+  position:absolute;left:50%;bottom:110px;
+  transform:translateX(-50%) translateY(6px);
+  z-index:30;
+  padding:8px 18px;
+  background:
+    linear-gradient(180deg,rgba(58,31,16,.96),rgba(26,14,8,.96));
+  border:2px solid var(--gold-dk);
+  border-radius:15px;
+  box-shadow:
+    inset 0 0 0 1px rgba(240,200,96,.4),
+    0 4px 10px rgba(0,0,0,.7);
+  color:var(--gold-lt);
+  font-size:12px;
+  letter-spacing:.5px;
+  text-shadow:0 1px 0 #000;
+  white-space:nowrap;
+  max-width:90%;
+  overflow:hidden;text-overflow:ellipsis;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease,transform .25s ease;
+}
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* ================= 顶部提示条（场景名切换） ================= */
+#sceneBanner{
+  position:absolute;top:44%;left:50%;
+  transform:translate(-50%,-50%) scale(.85);
+  z-index:40;
+  padding:10px 34px;
+  background:
+    linear-gradient(180deg,rgba(58,31,16,.94),rgba(26,14,8,.94));
+  border-top:2px solid var(--gold);
+  border-bottom:2px solid var(--gold);
+  box-shadow:
+    0 0 24px rgba(240,200,96,.35),
+    inset 0 0 24px rgba(240,200,96,.1);
+  font-size:20px;font-weight:bold;
+  letter-spacing:8px;
+  color:var(--gold-lt);
+  text-shadow:0 2px 0 #000,0 0 16px rgba(240,200,96,.8);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .4s ease,transform .4s ease;
+}
+#sceneBanner.show{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
+}
+
+/* ============================================================
+   ↓↓↓ 第 2 批结束，第 3 批将接续：底部菜单栏 / 弹窗容器 / 完整HTML结构
+   ============================================================ */
+/* ============================================================
+   梦幻西游 · Q版像素单机  —— 第 3 批
+   底部菜单栏 / 弹窗系统 / 通用对话框
+   ============================================================ */
+
+/* ================= 底部主菜单栏 ================= */
+#bottomBar{
+  flex-shrink:0;z-index:25;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:4px;
+  padding:6px 8px 8px;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,.15) 0 2px,
+      transparent 2px 6px),
+    linear-gradient(0deg,#2a1608,#5a3218 60%,#3a1f0e);
+  border-top:3px solid #140a04;
+  box-shadow:
+    0 -3px 0 rgba(0,0,0,.4),
+    0 -5px 12px rgba(0,0,0,.6),
+    inset 0 1px 0 rgba(240,200,96,.25);
+}
+
+.menu-btn{
+  position:relative;
+  padding:6px 2px 5px;
+  font-family:inherit;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:1px;
+  color:#ffe8a0;
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(0,0,0,.08) 0 2px,
+      transparent 2px 4px),
+    linear-gradient(180deg,#8a5228,#5a3218 55%,#3a1f0e);
+  border:2px solid #2a1608;
+  border-radius:7px;
+  box-shadow:
+    inset 0 1px 0 rgba(240,200,96,.5),
+    inset 0 -3px 5px rgba(0,0,0,.45),
+    0 3px 0 #140a04,
+    0 4px 7px rgba(0,0,0,.5);
+  cursor:pointer;
+  transition:all .07s;
+  -webkit-user-select:none;
+  overflow:hidden;
+}
+.menu-btn::before{
+  content:'';position:absolute;inset:2px;
+  border:1px solid rgba(240,200,96,.18);
+  border-radius:5px;pointer-events:none;
+}
+.menu-btn .mi{
+  font-size:20px;line-height:1;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));
+  transition:transform .1s;
+}
+.menu-btn .mt{
+  font-size:10px;font-weight:bold;
+  letter-spacing:1px;
+  text-shadow:0 1px 0 #000,0 0 5px rgba(240,200,96,.4);
+  color:#ffe8a0;
+}
+.menu-btn:active{
+  transform:translateY(3px);
+  box-shadow:
+    inset 0 1px 0 rgba(240,200,96,.5),
+    inset 0 -1px 3px rgba(0,0,0,.45),
+    0 0 0 #140a04,
+    0 1px 3px rgba(0,0,0,.5);
+}
+.menu-btn:active .mi{transform:scale(.9)}
+.menu-btn.disabled{
+  filter:grayscale(.7) brightness(.6);
+  cursor:not-allowed;
+  opacity:.55;
+}
+
+/* 红色高亮按钮（战斗时出现） */
+.menu-btn.danger{
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(0,0,0,.08) 0 2px,
+      transparent 2px 4px),
+    linear-gradient(180deg,#c03030,#801818 55%,#501010);
+}
+.menu-btn.danger .mt{color:#ffd0d0;text-shadow:0 1px 0 #000,0 0 6px rgba(255,80,80,.6)}
+
+/* 带红点通知 */
+.menu-btn.has-dot::after{
+  content:'';position:absolute;top:3px;right:3px;
+  width:8px;height:8px;
+  background:radial-gradient(circle,#ff4040,#a01010);
+  border:1px solid #400808;
+  border-radius:50%;
+  box-shadow:0 0 6px rgba(255,64,64,.8);
+  animation:dotPulse 1.2s ease-in-out infinite;
+}
+@keyframes dotPulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.25)}
+}
+
+/* ================= 弹窗遮罩层 ================= */
+.modal{
+  position:absolute;inset:0;z-index:100;
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(10,6,4,.72) 0%,
+      rgba(4,2,1,.9) 100%);
+  display:flex;align-items:center;justify-content:center;
+  padding:14px;
+  opacity:0;pointer-events:none;
+  transition:opacity .22s ease;
+  backdrop-filter:blur(2px);
+}
+.modal.show{
+  opacity:1;pointer-events:auto;
+}
+
+/* ================= 通用弹窗容器 ================= */
+.dialog{
+  width:100%;max-width:440px;
+  max-height:88%;
+  display:flex;flex-direction:column;
+  background:
+    repeating-linear-gradient(92deg,
+      rgba(0,0,0,.10) 0 2px,
+      rgba(255,220,160,.03) 2px 5px,
+      transparent 5px 9px),
+    linear-gradient(180deg,#6b3a1a 0%,#4a2812 55%,#3a1f0e 100%);
+  border:3px solid var(--wood-dark);
+  border-radius:10px;
+  box-shadow:
+    inset 0 0 0 1px rgba(240,200,120,.28),
+    inset 0 2px 6px rgba(255,220,160,.12),
+    inset 0 -4px 10px rgba(0,0,0,.5),
+    0 6px 24px rgba(0,0,0,.8),
+    0 0 60px rgba(240,200,96,.1);
+  transform:scale(.92) translateY(8px);
+  transition:transform .25s cubic-bezier(.25,1.4,.5,1);
+  overflow:hidden;
+  position:relative;
+}
+.dialog::before{
+  content:'';position:absolute;inset:5px;
+  border:1px dashed rgba(240,200,96,.25);
+  border-radius:6px;pointer-events:none;z-index:1;
+}
+.modal.show .dialog{
+  transform:scale(1) translateY(0);
+}
+
+/* 弹窗头部（带卷轴标题） */
+.dialog-head{
+  flex-shrink:0;
+  position:relative;
+  padding:14px 40px 10px;
+  text-align:center;
+  background:
+    linear-gradient(180deg,
+      rgba(90,50,24,.6),
+      rgba(40,20,8,.4));
+  border-bottom:2px solid rgba(240,200,96,.22);
+  box-shadow:inset 0 1px 0 rgba(240,200,96,.25);
+}
+.dialog-title{
+  display:inline-block;
+  padding:4px 26px;
+  font-size:14px;font-weight:bold;
+  letter-spacing:5px;
+  color:#3a1f0e;
+  background:
+    linear-gradient(180deg,var(--gold-lt),var(--gold) 50%,var(--gold-dk));
+  border:2px solid #6a4810;
+  border-radius:13px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.8),
+    inset 0 -2px 4px rgba(120,80,20,.4),
+    0 2px 6px rgba(0,0,0,.5);
+  text-shadow:0 1px 0 rgba(255,255,255,.55);
+  position:relative;
+}
+.dialog-title::before,
+.dialog-title::after{
+  content:'❖';
+  position:absolute;top:50%;transform:translateY(-50%);
+  font-size:10px;color:#6a4810;
+}
+.dialog-title::before{left:8px}
+.dialog-title::after{right:8px}
+
+/* 关闭按钮 */
+.dialog-close{
+  position:absolute;
+  top:10px;right:10px;
+  width:32px;height:32px;
+  padding:0;
+  font-family:inherit;
+  font-size:16px;font-weight:bold;
+  color:#ffe8a0;
+  background:
+    linear-gradient(180deg,#a83828,#681810);
+  border:2px solid #2a0808;
+  border-radius:50%;
+  box-shadow:
+    inset 0 1px 0 rgba(255,180,140,.5),
+    inset 0 -2px 3px rgba(0,0,0,.5),
+    0 2px 5px rgba(0,0,0,.6);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .08s;
+  z-index:3;
+  text-shadow:0 1px 0 #000;
+}
+.dialog-close:active{
+  transform:translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,180,140,.5),
+    inset 0 -1px 2px rgba(0,0,0,.5),
+    0 0 0 rgba(0,0,0,.6);
+}
+
+/* 弹窗内容区 */
+.dialog-body{
+  flex:1;min-height:0;
+  overflow-y:auto;
+  padding:12px 14px;
+  position:relative;z-index:2;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(240,200,96,.45) rgba(0,0,0,.3);
+}
+.dialog-body::-webkit-scrollbar{width:8px}
+.dialog-body::-webkit-scrollbar-track{
+  background:rgba(0,0,0,.4);
+  border-radius:4px;
+}
+.dialog-body::-webkit-scrollbar-thumb{
+  background:
+    linear-gradient(180deg,var(--gold),var(--gold-dk));
+  border-radius:4px;
+  border:1px solid #6a4810;
+}
+
+/* 弹窗底部按钮区 */
+.dialog-foot{
+  flex-shrink:0;
+  padding:10px 14px 12px;
+  display:flex;gap:8px;
+  justify-content:center;
+  background:
+    linear-gradient(0deg,rgba(26,14,8,.6),transparent);
+  border-top:1px solid rgba(240,200,96,.18);
+  position:relative;z-index:2;
+}
+
+/* ================= 通用按钮 ================= */
+.btn{
+  flex:1;min-width:80px;
+  padding:10px 14px;
+  font-family:inherit;
+  font-size:12.5px;font-weight:bold;
+  letter-spacing:2px;
+  color:#ffe8a0;
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(0,0,0,.08) 0 2px,
+      transparent 2px 4px),
+    linear-gradient(180deg,#8a5228,#5a3218 55%,#3a1f0e);
+  border:2px solid #2a1608;
+  border-radius:6px;
+  box-shadow:
+    inset 0 1px 0 rgba(240,200,96,.5),
+    inset 0 -3px 5px rgba(0,0,0,.45),
+    0 3px 0 #140a04,
+    0 4px 7px rgba(0,0,0,.5);
+  cursor:pointer;
+  transition:all .07s;
+  -webkit-user-select:none;
+  text-shadow:0 1px 0 #000;
+  position:relative;
+}
+.btn::before{
+  content:'';position:absolute;inset:2px;
+  border:1px solid rgba(240,200,96,.18);
+  border-radius:4px;pointer-events:none;
+}
+.btn:active{
+  transform:translateY(3px);
+  box-shadow:
+    inset 0 1px 0 rgba(240,200,96,.5),
+    inset 0 -1px 3px rgba(0,0,0,.45),
+    0 0 0 #140a04,
+    0 1px 3px rgba(0,0,0,.5);
+}
+.btn:disabled{
+  filter:grayscale(.75) brightness(.55);
+  cursor:not-allowed;
+  opacity:.6;
+}
+/* 主按钮（金色） */
+.btn.primary{
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(0,0,0,.06) 0 2px,
+      transparent 2px 4px),
+    linear-gradient(180deg,#f0c860,#c89020 55%,#8a6010);
+  color:#3a1f0e;
+  border-color:#6a4810;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.6),
+    inset 0 -3px 5px rgba(120,80,20,.45),
+    0 3px 0 #5a4010,
+    0 4px 7px rgba(0,0,0,.5);
+  text-shadow:0 1px 0 rgba(255,255,255,.5);
+}
+.btn.primary::before{border-color:rgba(120,80,20,.3)}
+/* 危险按钮（红色） */
+.btn.danger{
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(0,0,0,.08) 0 2px,
+      transparent 2px 4px),
+    linear-gradient(180deg,#c03030,#801818 55%,#501010);
+  color:#ffd0d0;
+  border-color:#2a0808;
+  box-shadow:
+    inset 0 1px 0 rgba(255,180,140,.5),
+    inset 0 -3px 5px rgba(0,0,0,.5),
+    0 3px 0 #280808,
+    0 4px 7px rgba(0,0,0,.5);
+  text-shadow:0 1px 0 #000,0 0 5px rgba(255,80,80,.5);
+}
+/* 小按钮 */
+.btn.small{
+  flex:0 0 auto;
+  min-width:auto;
+  padding:6px 12px;
+  font-size:11px;
+  letter-spacing:1px;
+  border-radius:5px;
+  box-shadow:
+    inset 0 1px 0 rgba(240,200,96,.5),
+    inset 0 -2px 4px rgba(0,0,0,.45),
+    0 2px 0 #140a04,
+    0 3px 5px rgba(0,0,0,.45);
+}
+.btn.small:active{
+  transform:translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgba(240,200,96,.5),
+    inset 0 -1px 2px rgba(0,0,0,.45),
+    0 0 0 #140a04,
+    0 1px 2px rgba(0,0,0,.45);
+}
+
+/* ================= 列表项通用样式 ================= */
+.list-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 11px;
+  margin-bottom:7px;
+  background:
+    linear-gradient(180deg,
+      rgba(255,220,160,.08),
+      rgba(0,0,0,.25));
+  border:2px solid rgba(240,200,96,.22);
+  border-radius:6px;
+  box-shadow:
+    inset 0 1px 0 rgba(240,200,96,.15),
+    0 2px 4px rgba(0,0,0,.35);
+  transition:all .12s;
+  position:relative;
+}
+.list-item.clickable{
+  cursor:pointer;
+}
+.list-item.clickable:active{
+  background:
+    linear-gradient(180deg,
+      rgba(240,200,96,.22),
+      rgba(0,0,0,.35));
+  transform:translateX(2px);
+  border-color:rgba(240,200,96,.5);
+}
+.list-item .li-icon{
+  width:38px;height:38px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  background:
+    radial-gradient(circle at 50% 35%,
+      rgba(240,200,96,.25),transparent 70%),
+    linear-gradient(180deg,rgba(90,50,24,.6),rgba(40,20,8,.6));
+  border:1.5px solid rgba(240,200,96,.35);
+  border-radius:6px;
+  box-shadow:inset 0 1px 0 rgba(240,200,96,.2);
+}
+.list-item .li-body{flex:1;min-width:0}
+.list-item .li-name{
+  font-size:12.5px;font-weight:bold;
+  color:#ffe8a0;
+  letter-spacing:.5px;
+  text-shadow:0 1px 0 #000;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.list-item .li-name .li-count{
+  color:#f0c860;font-size:11px;margin-left:4px;
+  font-weight:normal;
+}
+.list-item .li-desc{
+  font-size:10.5px;color:#c0a870;
+  margin-top:3px;line-height:1.5;
+}
+.list-item .li-desc b{color:#ff8060}
+.list-item .li-desc i{font-style:normal;color:#80d0ff}
+.list-item .li-right{
+  flex-shrink:0;
+  font-size:11px;
+  color:#f0c860;
+  text-align:right;
+  white-space:nowrap;
+}
+.list-item .li-right small{
+  display:block;
+  color:#c0a870;font-size:9.5px;
+  margin-top:2px;
+}
+.list-item .li-btn{
+  flex-shrink:0;
+  margin-left:6px;
+  padding:6px 12px;
+  font-family:inherit;
+  font-size:11px;font-weight:bold;
+  letter-spacing:1px;
+  color:#3a1f0e;
+  background:
+    linear-gradient(180deg,#f0c860,#c89020 55%,#8a6010);
+  border:2px solid #6a4810;
+  border-radius:5px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.6),
+    inset 0 -2px 4px rgba(120,80,20,.45),
+    0 2px 0 #5a4010,
+    0 3px 5px rgba(0,0,0,.45);
+  cursor:pointer;
+  transition:all .07s;
+  text-shadow:0 1px 0 rgba(255,255,255,.4);
+}
+.list-item .li-btn:active{
+  transform:translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.6),
+    inset 0 -1px 2px rgba(120,80,20,.45),
+    0 0 0 #5a4010,
+    0 1px 2px rgba(0,0,0,.45);
+}
+.list-item .li-btn:disabled{
+  filter:grayscale(.8) brightness(.6);
+  cursor:not-allowed;opacity:.6;
+}
+
+/* 稀有度光边 */
+.list-item.rare-1{border-color:rgba(120,180,240,.5)}
+.list-item.rare-1 .li-name{color:#80c0ff}
+.list-item.rare-2{border-color:rgba(190,130,255,.55)}
+.list-item.rare-2 .li-name{color:#d090ff}
+.list-item.rare-3{
+  border-color:rgba(255,180,60,.65);
+  box-shadow:
+    inset 0 1px 0 rgba(240,200,96,.2),
+    0 0 12px rgba(255,180,60,.25),
+    0 2px 4px rgba(0,0,0,.35);
+}
+.list-item.rare-3 .li-name{color:#ffd060}
+
+/* ================= 空状态提示 ================= */
+.empty-tip{
+  text-align:center;
+  padding:32px 12px;
+  color:#8a7050;
+  font-size:12px;
+  letter-spacing:1px;
+  text-shadow:0 1px 0 #000;
+}
+.empty-tip .ei{
+  font-size:36px;
+  display:block;
+  margin-bottom:10px;
+  opacity:.5;
+  filter:grayscale(.5);
+}
+
+/* ================= 属性格子 ================= */
+.stat-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-bottom:10px;
+}
+.stat-box{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 11px;
+  background:
+    linear-gradient(180deg,
+      rgba(255,220,160,.08),
+      rgba(0,0,0,.28));
+  border:1.5px solid rgba(240,200,96,.22);
+  border-radius:6px;
+  box-shadow:inset 0 1px 0 rgba(240,200,96,.12);
+  font-size:11.5px;
+}
+.stat-box .sk{
+  color:#c0a870;
+  display:flex;align-items:center;gap:4px;
+  letter-spacing:.5px;
+}
+.stat-box .sk .ski{font-size:13px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+.stat-box .sv{
+  color:#ffe8a0;
+  font-weight:bold;
+  font-size:13px;
+  text-shadow:0 1px 0 #000;
+  letter-spacing:.3px;
+}
+.stat-box .sv small{
+  color:#c0a870;font-weight:normal;
+  font-size:10px;margin-left:2px;
+}
+.stat-box.gold .sv{color:#ffd060}
+.stat-box.hp .sv{color:#ff8060}
+.stat-box.mp .sv{color:#80c0ff}
+.stat-box.exp .sv{color:#f0c860}
+
+/* ================= 分区标题 ================= */
+.section-title{
+  display:flex;align-items:center;
+  gap:8px;
+  margin:12px 0 8px;
+  font-size:11.5px;
+  color:var(--gold-lt);
+  letter-spacing:3px;
+  font-weight:bold;
+  text-shadow:0 1px 0 #000;
+}
+.section-title::before,
+.section-title::after{
+  content:'';
+  flex:1;height:1px;
+  background:linear-gradient(90deg,
+    transparent,
+    rgba(240,200,96,.5),
+    transparent);
+}
+.section-title::before{
+  background:linear-gradient(90deg,
+    transparent,
+    rgba(240,200,96,.5));
+}
+.section-title::after{
+  background:linear-gradient(90deg,
+    rgba(240,200,96,.5),
+    transparent);
+}
+.section-title .sti{
+  font-size:14px;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.6));
+}
+
+/* ============================================================
+   ↓↓↓ 第 3 批结束，第 4 批将接续：门派选择界面 / 战斗界面
+   ============================================================ */
+
+
+/* ============================================================
+   响应式适配：手机竖屏 / 手机横屏 / 平板 / 电脑
+   ============================================================ */
+html,body{width:100%;min-width:0;}
+#game{width:100%;max-width:none;height:100dvh;}
+
+/* 电脑 / 大屏：采用宽屏游戏布局，避免原来的 640px 限制 */
+@media (min-width: 900px){
+  body{align-items:center;}
+  #game{
+    width:min(1180px,100vw);
+    height:min(900px,100dvh);
+    border-left:1px solid #241207;
+    border-right:1px solid #241207;
+  }
+  #topbar{padding:7px 10px;gap:8px;}
+  #bottomBar{padding:7px 12px 9px;gap:7px;}
+  .menu-btn{min-height:58px;}
+  .menu-btn .mi{font-size:22px;}
+  #dpad{right:20px;bottom:20px;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,52px);}
+  #dpad button{font-size:24px;}
+  #toast{bottom:120px;}
+}
+
+/* 手机竖屏：顶部信息、地图和底部菜单紧凑排列 */
+@media (max-width: 899px) and (orientation: portrait){
+  #topbar{min-height:72px;padding:4px 5px;gap:3px;}
+  #portrait{width:50px;height:58px;}
+  #pName{font-size:12px;max-width:78px;}
+  #pSect{font-size:9px;padding:1px 5px;}
+  .status-icons{gap:3px;font-size:8px;}
+  #goldBox{min-width:54px;padding:4px 5px;}
+  #stage{min-height:0;}
+  #dpad{right:8px;bottom:8px;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,42px);gap:2px;}
+  #dpad button{font-size:19px;}
+  #miniMapBtn{top:8px;right:8px;}
+  #bottomBar{padding:4px 5px 5px;gap:3px;}
+  .menu-btn{min-height:50px;padding:4px 1px 3px;}
+  .menu-btn .mi{font-size:18px;}
+  .menu-btn .mt{font-size:9px;letter-spacing:0;}
+  #sceneTitle{font-size:12px;padding:4px 10px;}
+  #sceneBanner{font-size:16px;letter-spacing:4px;padding:8px 18px;max-width:90vw;white-space:nowrap;}
+  #toast{bottom:78px;max-width:88vw;font-size:11px;}
+}
+
+/* 手机横屏：把竖向空间让给地图，顶部/底部进一步压缩 */
+@media (max-width: 899px) and (orientation: landscape){
+  #topbar{min-height:52px;height:52px;padding:3px 6px;gap:4px;}
+  #portrait{width:42px;height:46px;}
+  #pName{font-size:11px;max-width:90px;}
+  #pSect{font-size:8px;padding:0 5px;}
+  .status-icons{font-size:7px;gap:3px;}
+  #goldBox{min-width:58px;padding:2px 5px;}
+  #stage{min-height:0;}
+  #dpad{right:8px;bottom:6px;grid-template-columns:repeat(3,38px);grid-template-rows:repeat(3,38px);gap:2px;}
+  #dpad button{font-size:17px;}
+  #miniMapBtn{top:6px;right:7px;}
+  #bottomBar{height:54px;padding:3px 6px 4px;gap:3px;}
+  .menu-btn{min-height:45px;padding:2px 1px;}
+  .menu-btn .mi{font-size:16px;}
+  .menu-btn .mt{font-size:8px;letter-spacing:0;}
+  #toast{bottom:62px;max-width:70vw;font-size:10px;}
+  #sceneBanner{font-size:15px;padding:6px 16px;letter-spacing:3px;}
+}
+
+/* 极矮横屏（手机横着时尤其常见） */
+@media (max-height: 500px) and (orientation: landscape){
+  #topbar{height:46px;min-height:46px;}
+  #portrait{width:36px;height:40px;}
+  #bottomBar{height:48px;}
+  .menu-btn{min-height:39px;}
+  .menu-btn .mi{font-size:14px;}
+  .menu-btn .mt{font-size:7px;}
+  #dpad{grid-template-columns:repeat(3,34px);grid-template-rows:repeat(3,34px);right:6px;bottom:4px;}
+}
+
+/* 防止 iPhone / Safari 横竖屏切换后出现旧尺寸残留 */
+@supports (height: 100svh){
+  #game{height:100svh;min-height:100svh;}
+  @media (min-width:900px){#game{height:min(900px,100svh);min-height:0;}}
+}
+
+
+/* ================= 地图怪物图片 ================= */
+.map-monster{
+  position:absolute;
+  left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  z-index:8;
+  pointer-events:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-width:30px;
+  text-shadow:1px 1px 0 #000,-1px -1px 0 #000;
+}
+.map-monster-img{
+  display:block;
+  font-size:28px;
+  line-height:1;
+  filter:drop-shadow(0 2px 1px rgba(0,0,0,.65));
+  image-rendering:pixelated;
+  animation:monsterIdle 1.4s steps(2,end) infinite;
+}
+.map-monster-name{
+  margin-top:2px;
+  padding:1px 3px;
+  border:1px solid rgba(255,220,140,.65);
+  background:rgba(30,10,10,.78);
+  color:#ffe7b0;
+  font-size:9px;
+  line-height:11px;
+  white-space:nowrap;
+  border-radius:2px;
+}
+@keyframes monsterIdle{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-2px)}
+}
+
+@media (max-width:899px){
+  .map-monster-img{font-size:22px;}
+  .map-monster-name{font-size:8px;line-height:10px;padding:1px 2px;}
+}
+</style>
+</head>
+<body>
+<div id="game">
+  
+  <!-- ============ 顶部状态栏 ============ -->
+  <header id="topbar">
+    <div id="portrait">
+      <svg viewBox="0 0 16 18" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+        <!-- 头发 -->
+        <rect x="4" y="0" width="8" height="2" fill="#2a1620"/>
+        <rect x="3" y="2" width="1" height="4" fill="#2a1620"/>
+        <rect x="12" y="2" width="1" height="4" fill="#2a1620"/>
+        <rect x="4" y="2" width="8" height="2" fill="#3a2630"/>
+        <!-- 脸 -->
+        <rect x="4" y="2" width="8" height="7" fill="#f5d8b8"/>
+        <!-- 发带 -->
+        <rect x="3" y="3" width="10" height="1" fill="#4a9a7a"/>
+        <rect x="3" y="3" width="1" height="2" fill="#2a6a52"/>
+        <rect x="12" y="3" width="1" height="2" fill="#2a6a52"/>
+        <!-- 眼 -->
+        <rect x="5" y="5" width="2" height="2" fill="#1a0e18"/>
+        <rect x="9" y="5" width="2" height="2" fill="#1a0e18"/>
+        <rect x="5" y="5" width="1" height="1" fill="#ffffff"/>
+        <rect x="9" y="5" width="1" height="1" fill="#ffffff"/>
+        <!-- 腮红 -->
+        <rect x="4" y="7" width="1" height="1" fill="#f0a8a0"/>
+        <rect x="11" y="7" width="1" height="1" fill="#f0a8a0"/>
+        <!-- 嘴 -->
+        <rect x="7" y="7" width="2" height="1" fill="#c87868"/>
+        <!-- 脖子 -->
+        <rect x="7" y="9" width="2" height="1" fill="#e8c0a0"/>
+        <!-- 衣袍 -->
+        <rect x="2" y="10" width="12" height="8" fill="#e8d8b0"/>
+        <!-- 衣领 -->
+        <rect x="6" y="10" width="4" height="1" fill="#4a9a7a"/>
+        <rect x="5" y="11" width="1" height="1" fill="#4a9a7a"/>
+        <rect x="10" y="11" width="1" height="1" fill="#4a9a7a"/>
+        <!-- 外袖 -->
+        <rect x="1" y="11" width="1" height="5" fill="#3a5a80"/>
+        <rect x="14" y="11" width="1" height="5" fill="#3a5a80"/>
+        <!-- 腰带 -->
+        <rect x="3" y="15" width="10" height="1" fill="#3a5a80"/>
+        <rect x="7" y="15" width="2" height="1" fill="#f0c860"/>
+        <!-- 云纹 -->
+        <rect x="3" y="12" width="2" height="1" fill="#c8a860"/>
+        <rect x="11" y="12" width="2" height="1" fill="#c8a860"/>
+        <rect x="4" y="13" width="1" height="1" fill="#c8a860"/>
+        <rect x="11" y="13" width="1" height="1" fill="#c8a860"/>
+      </svg>
+    </div>
+    
+    <div class="info-mid">
+      <div class="name-row">
+        <span id="pName">无名侠客</span>
+        <span id="pSect">大唐官府</span>
+        <span id="pLv">Lv.<b>1</b></span>
+      </div>
+      <div class="bars">
+        <div class="sbar hp">
+          <div class="fill" id="hpFill" style="width:100%"></div>
+          <div class="label"><span>气血</span><span><b id="hpText">100</b>/<i id="hpMax">100</i></span></div>
+        </div>
+        <div class="sbar mp">
+          <div class="fill" id="mpFill" style="width:100%"></div>
+          <div class="label"><span>法力</span><span><b id="mpText">50</b>/<i id="mpMax">50</i></span></div>
+        </div>
+        <div class="sbar exp">
+          <div class="fill" id="expFill" style="width:0%"></div>
+          <div class="label"><span>经验</span><span><b id="expText">0</b>/<i id="expMax">60</i></span></div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="goldBox">
+      <div class="g-icon">💰</div>
+      <div class="g-val"><span id="goldVal">100</span><small>两</small></div>
+    </div>
+  </header>
+  
+  <!-- ============ 主视图区 ============ -->
+  <main id="stage">
+    <div id="world"></div>
+    
+    <div id="sceneTitle">
+      长安城 <b>·</b> <i>中心广场</i>
+    </div>
+    
+    <div id="miniMapBtn">
+      <div class="mi">🗺️</div>
+      <div class="mt">地图</div>
+    </div>
+    
+    <div id="dpad">
+      <button class="u" data-dir="up">▲</button>
+      <button class="l" data-dir="left">◀</button>
+      <button class="c" id="btnCenter">中</button>
+      <button class="r" data-dir="right">▶</button>
+      <button class="d" data-dir="down">▼</button>
+    </div>
+    
+    <div id="toast"></div>
+    <div id="sceneBanner"></div>
+  </main>
+  
+  <!-- ============ 底部主菜单 ============ -->
+  <footer id="bottomBar">
+    <button class="menu-btn" data-menu="char">
+      <span class="mi">🧝</span>
+      <span class="mt">人物</span>
+    </button>
+    <button class="menu-btn" data-menu="bag">
+      <span class="mi">🎒</span>
+      <span class="mt">背包</span>
+    </button>
+    <button class="menu-btn" data-menu="skill">
+      <span class="mi">✨</span>
+      <span class="mt">技能</span>
+    </button>
+    <button class="menu-btn" data-menu="pet">
+      <span class="mi">🐾</span>
+      <span class="mt">召唤兽</span>
+    </button>
+    <button class="menu-btn" data-menu="task">
+      <span class="mi">📜</span>
+      <span class="mt">任务</span>
+    </button>
+  </footer>
+  
+  <!-- ============ 弹窗容器 ============ -->
+  
+  <!-- 人物面板 -->
+  <div class="modal" id="modalChar">
+    <div class="dialog">
+      <div class="dialog-head">
+        <div class="dialog-title">人 物</div>
+        <button class="dialog-close" data-close="modalChar">✕</button>
+      </div>
+      <div class="dialog-body" id="charBody"></div>
+      <div class="dialog-foot">
+        <button class="btn primary" data-close="modalChar">关 闭</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 背包 -->
+  <div class="modal" id="modalBag">
+    <div class="dialog">
+      <div class="dialog-head">
+        <div class="dialog-title">背 包</div>
+        <button class="dialog-close" data-close="modalBag">✕</button>
+      </div>
+      <div class="dialog-body" id="bagBody"></div>
+      <div class="dialog-foot">
+        <button class="btn primary" data-close="modalBag">关 闭</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 技能 -->
+  <div class="modal" id="modalSkill">
+    <div class="dialog">
+      <div class="dialog-head">
+        <div class="dialog-title">技 能</div>
+        <button class="dialog-close" data-close="modalSkill">✕</button>
+      </div>
+      <div class="dialog-body" id="skillBody"></div>
+      <div class="dialog-foot">
+        <button class="btn primary" data-close="modalSkill">关 闭</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 召唤兽 -->
+  <div class="modal" id="modalPet">
+    <div class="dialog">
+      <div class="dialog-head">
+        <div class="dialog-title">召 唤 兽</div>
+        <button class="dialog-close" data-close="modalPet">✕</button>
+      </div>
+      <div class="dialog-body" id="petBody"></div>
+      <div class="dialog-foot">
+        <button class="btn primary" data-close="modalPet">关 闭</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 任务 -->
+  <div class="modal" id="modalTask">
+    <div class="dialog">
+      <div class="dialog-head">
+        <div class="dialog-title">任 务</div>
+        <button class="dialog-close" data-close="modalTask">✕</button>
+      </div>
+      <div class="dialog-body" id="taskBody"></div>
+      <div class="dialog-foot">
+        <button class="btn primary" data-close="modalTask">关 闭</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 门派选择（初始弹窗） -->
+  <div class="modal show" id="modalSect">
+    <div class="dialog">
+      <div class="dialog-head">
+        <div class="dialog-title">选 择 门 派</div>
+      </div>
+      <div class="dialog-body" id="sectBody"></div>
+      <div class="dialog-foot">
+        <button class="btn primary" id="btnSectConfirm" disabled>确 定</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ============================================================
+   梦幻西游 · Q版像素单机  —— 第 4 批
+   工具函数 / 门派数据 / 物品数据 / 玩家状态 / 门派选择
+   ============================================================ */
+
+/* ================= 工具函数 ================= */
+const $ = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* 确定性随机（用于地图生成） */
+function hash(c, r, salt){
+  let h = (Math.imul(c|0, 73856093) ^ Math.imul(r|0, 19349663) ^ Math.imul(salt|0, 83492791)) >>> 0;
+  h ^= h >>> 15;
+  h = Math.imul(h, 0x85ebca6b) >>> 0;
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35) >>> 0;
+  h ^= h >>> 16;
+  return h / 4294967296;
+}
+function noise2(x, y, salt){
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = x - xi, yf = y - yi;
+  const a = hash(xi, yi, salt);
+  const b = hash(xi+1, yi, salt);
+  const c = hash(xi, yi+1, salt);
+  const d = hash(xi+1, yi+1, salt);
+  const sx = xf * xf * (3 - 2*xf);
+  const sy = yf * yf * (3 - 2*yf);
+  return (a*(1-sx) + b*sx)*(1-sy) + (c*(1-sx) + d*sx)*sy;
+}
+/* 数字格式化 */
+function fmt(n){
+  n = Math.floor(n);
+  if (n < 1e4) return String(n);
+  if (n >= 1e44) return n.toExponential(2).replace('e+','e');
+  const u = [[1e4,'万'],[1e8,'亿'],[1e12,'兆'],[1e16,'京'],[1e20,'垓'],
+             [1e24,'秭'],[1e28,'穰'],[1e32,'沟'],[1e36,'涧'],[1e40,'正']];
+  for (let i = u.length-1; i >= 0; i--){
+    if (n >= u[i][0]){
+      const v = n / u[i][0];
+      return (v >= 1000 ? v.toFixed(0) : v.toFixed(1)) + u[i][1];
+    }
+  }
+  return String(n);
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ============================================================
+   门派数据（致敬梦幻西游十二门派，取其中五大经典）
+   ============================================================ */
+const SECTS = [
+  {
+    id: 'datang',
+    name: '大唐官府',
+    icon: '⚔️',
+    color: '#c84040',
+    desc: '三界武力第一，物理单体爆发，攻守兼备。',
+    longDesc: '大唐官府弟子勤修武艺，以横扫千军之姿名震江湖。气血充沛，物理攻击极强，适合冲锋陷阵。',
+    base: { hp: 140, mp: 30, atk: 22, def: 12, spd: 12, magic: 6 },
+    grow: { hp: 18, mp: 3, atk: 4.5, def: 2.2, spd: 1, magic: 0.6 },
+    skills: [
+      { id:'heng', name:'横扫千军', lv:1, mp:8,  type:'phys',   power:1.85, target:'single', desc:'对单个目标造成185%物理伤害' },
+      { id:'hou',  name:'后发制人', lv:5, mp:16, type:'phys',   power:2.6,  target:'single', desc:'蓄力一击，造成260%物理伤害' },
+      { id:'jian', name:'剑气纵横', lv:10,mp:28, type:'phys',   power:1.55, target:'all',    desc:'对敌方全体造成155%物理伤害' },
+      { id:'po',   name:'破釜沉舟', lv:20,mp:45, type:'phys',   power:3.5,  target:'single', desc:'舍命一击，350%物理伤害但自损10%气血' },
+    ]
+  },
+  {
+    id: 'fangcun',
+    name: '方寸山',
+    icon: '🔮',
+    color: '#8060d0',
+    desc: '法术控制流派，单体高伤，擅长封印。',
+    longDesc: '方寸山弟子修习雷法与符箓，以五雷咒与定身术闻名。法术伤害极高，能限制敌人行动。',
+    base: { hp: 110, mp: 70, atk: 12, def: 9, spd: 15, magic: 20 },
+    grow: { hp: 13, mp: 8, atk: 2.2, def: 1.6, spd: 1.2, magic: 4.2 },
+    skills: [
+      { id:'lei',  name:'五雷咒',   lv:1, mp:10, type:'magic',  power:2.1, target:'single', desc:'对单个目标造成210%法术伤害' },
+      { id:'ding', name:'定身术',   lv:5, mp:18, type:'debuff', power:0,   target:'single', desc:'使目标定身2回合，无法行动' },
+      { id:'mie',  name:'神雷天降', lv:10,mp:34, type:'magic',  power:1.75,target:'all',    desc:'对敌方全体造成175%法术伤害' },
+      { id:'feng', name:'天雷斩',   lv:20,mp:50, type:'magic',  power:4.0, target:'single', desc:'引天雷一击，400%法术伤害' },
+    ]
+  },
+  {
+    id: 'longgong',
+    name: '龙宫',
+    icon: '🐉',
+    color: '#3a80d0',
+    desc: '法术群攻流派，持续压制，法力深厚。',
+    longDesc: '龙宫弟子承龙族血脉，御水行云，呼风唤雨。群体法术强大，法力值最为充沛。',
+    base: { hp: 120, mp: 65, atk: 13, def: 10, spd: 11, magic: 18 },
+    grow: { hp: 14, mp: 7, atk: 2.4, def: 1.8, spd: 0.9, magic: 3.8 },
+    skills: [
+      { id:'shui', name:'龙腾水击', lv:1, mp:9,  type:'magic',  power:1.9, target:'single', desc:'对单个目标造成190%法术伤害' },
+      { id:'bing', name:'冰霜龙息', lv:5, mp:20, type:'magic',  power:1.45,target:'all',    desc:'对敌方全体造成145%法术伤害' },
+      { id:'nu',   name:'怒海狂涛', lv:10,mp:36, type:'magic',  power:2.0, target:'all',    desc:'对敌方全体造成200%法术伤害' },
+      { id:'long', name:'龙神降临', lv:20,mp:55, type:'magic',  power:4.5, target:'single', desc:'召唤龙神虚影，450%法术伤害' },
+    ]
+  },
+  {
+    id: 'putuo',
+    name: '普陀山',
+    icon: '🌸',
+    color: '#d070b0',
+    desc: '治疗辅助流派，持久生存，护佑队友。',
+    longDesc: '普陀山弟子慈悲为怀，习得杨柳甘露与金刚护体。气血充沛，能恢复自身与队友气血。',
+    base: { hp: 155, mp: 55, atk: 13, def: 13, spd: 10, magic: 14 },
+    grow: { hp: 20, mp: 6, atk: 2.4, def: 2.4, spd: 0.8, magic: 3.0 },
+    skills: [
+      { id:'liao', name:'杨柳甘露', lv:1, mp:12, type:'heal',   power:2.2, target:'self',   desc:'恢复自身220%法术攻击的气血' },
+      { id:'jin',  name:'金刚护体', lv:5, mp:18, type:'heal',   power:3.2, target:'self',   desc:'大幅恢复气血并临时提升防御' },
+      { id:'pu',   name:'普度众生', lv:10,mp:32, type:'magic',  power:1.6, target:'all',    desc:'对敌方全体造成160%法术伤害，同时恢复自身气血' },
+      { id:'fo',   name:'佛光普照', lv:20,mp:50, type:'heal',   power:6.0, target:'self',   desc:'佛光笼罩，恢复600%法术攻击的气血' },
+    ]
+  },
+  {
+    id: 'shituo',
+    name: '狮驼岭',
+    icon: '🦁',
+    color: '#d09030',
+    desc: '物理群攻流派，狂暴输出，越战越勇。',
+    longDesc: '狮驼岭弟子以兽化之力著称，狂暴的攻击让敌人闻风丧胆。气血最厚，群体物理伤害极高。',
+    base: { hp: 165, mp: 25, atk: 24, def: 11, spd: 13, magic: 5 },
+    grow: { hp: 22, mp: 2.5, atk: 5.2, def: 2.0, spd: 1.1, magic: 0.5 },
+    skills: [
+      { id:'bo',   name:'裂石破',   lv:1, mp:7,  type:'phys',  power:1.75,target:'single', desc:'对单个目标造成175%物理伤害' },
+      { id:'hou2', name:'狮搏',     lv:5, mp:16, type:'phys',  power:2.5, target:'single', desc:'猛扑撕咬，250%物理伤害' },
+      { id:'kuang',name:'狂兽咆哮', lv:10,mp:30, type:'phys',  power:1.55,target:'all',    desc:'对敌方全体造成155%物理伤害' },
+      { id:'xue',  name:'血战八方', lv:20,mp:48, type:'phys',  power:2.2, target:'all',    desc:'狂暴绞杀，对全体造成220%物理伤害' },
+    ]
+  },
+];
+
+/* ============================================================
+   物品数据
+   ============================================================ */
+const ITEMS = {
+  /* 药品 */
+  hp1:   { id:'hp1',   name:'金疮药',     icon:'🧪', type:'potion', rare:0, price:60,   desc:'恢复30%气血',           use(){ const v=Math.floor(P.maxHp*0.3); P.hp=Math.min(P.maxHp,P.hp+v); return `恢复 ${v} 气血`; } },
+  hp2:   { id:'hp2',   name:'九转还魂丹', icon:'⚗️', type:'potion', rare:1, price:400,  desc:'完全恢复气血',         use(){ P.hp=P.maxHp; return '气血全满'; } },
+  mp1:   { id:'mp1',   name:'清心散',     icon:'💧', type:'potion', rare:0, price:80,   desc:'恢复50%法力',           use(){ const v=Math.floor(P.maxMp*0.5); P.mp=Math.min(P.maxMp,P.mp+v); return `恢复 ${v} 法力`; } },
+  mp2:   { id:'mp2',   name:'龙涎香',     icon:'🫙', type:'potion', rare:1, price:350,  desc:'完全恢复法力',         use(){ P.mp=P.maxMp; return '法力全满'; } },
+  hp3:   { id:'hp3',   name:'大还丹',     icon:'🍶', type:'potion', rare:2, price:1500, desc:'恢复60%气血与法力',     use(){ const v1=Math.floor(P.maxHp*0.6), v2=Math.floor(P.maxMp*0.6); P.hp=Math.min(P.maxHp,P.hp+v1); P.mp=Math.min(P.maxMp,P.mp+v2); return `恢复 ${v1} 气血 · ${v2} 法力`; } },
+  /* 修炼 */
+  exp1:  { id:'exp1',  name:'修炼心得',   icon:'📜', type:'exp',    rare:1, price:500,  desc:'获得当前等级50%经验',   use(){ const v=Math.floor(expNeed()*0.5); gainExp(v); return `获得 ${v} 经验`; } },
+  exp2:  { id:'exp2',  name:'太上忘情录', icon:'📖', type:'exp',    rare:2, price:2000, desc:'获得当前等级150%经验',  use(){ const v=Math.floor(expNeed()*1.5); gainExp(v); return `获得 ${v} 经验`; } },
+  /* 强化 */
+  stone1:{ id:'stone1',name:'一级宝石',   icon:'💎', type:'gem',    rare:1, price:300,  desc:'攻击 +3',               use(){ P.atk+=3; return '攻击 +3'; } },
+  stone2:{ id:'stone2',name:'二级宝石',   icon:'🔷', type:'gem',    rare:2, price:800,  desc:'防御 +3',               use(){ P.def+=3; return '防御 +3'; } },
+  stone3:{ id:'stone3',name:'三级宝石',   icon:'🔶', type:'gem',    rare:3, price:2000, desc:'气血上限 +30',          use(){ P.maxHp+=30; P.hp+=30; return '气血上限 +30'; } },
+  /* 特殊 */
+  xuan:  { id:'xuan',  name:'玄天残卷',   icon:'📕', type:'special',rare:3, price:0,    desc:'随机获得2点属性',       use(){ P.atk+=1; P.def+=1; return '攻击 +1 · 防御 +1'; } },
+};
+
+/* ============================================================
+   怪物数据
+   ============================================================ */
+const MOBS = {
+  /* 长安城郊 */
+  lang:    { id:'lang',   name:'野狼',   icon:'🐺', lv:1,  hp:60,  atk:10, def:3,  spd:10, exp:25,  gold:15, skills:[] },
+  shanzei: { id:'shanzei',name:'山贼',   icon:'🗡️', lv:2,  hp:80,  atk:13, def:5,  spd:9,  exp:35,  gold:25, skills:[] },
+  liukou:  { id:'liukou', name:'流寇',   icon:'🏴', lv:3,  hp:100, atk:16, def:6,  spd:11, exp:45,  gold:30, skills:[] },
+  /* 江南野外 */
+  shuyao:  { id:'shuyao', name:'树妖',   icon:'🌳', lv:5,  hp:160, atk:20, def:10, spd:8,  exp:70,  gold:45, skills:[] },
+  chimang: { id:'chimang',name:'赤蟒',   icon:'🐍', lv:6,  hp:190, atk:24, def:8,  spd:12, exp:85,  gold:55, skills:[] },
+  linghu:  { id:'linghu', name:'灵狐',   icon:'🦊', lv:7,  hp:170, atk:26, def:7,  spd:18, exp:95,  gold:60, skills:[] },
+  /* 大唐境外 */
+  shamo:   { id:'shamo',  name:'沙魔',   icon:'🪨', lv:10, hp:300, atk:35, def:18, spd:9,  exp:150, gold:100,skills:[] },
+  shadao:  { id:'shadao', name:'沙盗',   icon:'🏹', lv:11, hp:280, atk:40, def:14, spd:14, exp:170, gold:120,skills:[] },
+  xieyan:  { id:'xieyan', name:'邪炎兽', icon:'🔥', lv:13, hp:380, atk:50, def:16, spd:13, exp:230, gold:160,skills:[{name:'烈焰',type:'magic',power:1.3}] },
+  /* 北俱芦洲 */
+  xuelang: { id:'xuelang',name:'雪狼',   icon:'🐺', lv:16, hp:450, atk:60, def:22, spd:15, exp:300, gold:200,skills:[] },
+  bingpo:  { id:'bingpo', name:'冰魄',   icon:'❄️', lv:18, hp:420, atk:70, def:20, spd:18, exp:350, gold:240,skills:[{name:'冰封',type:'magic',power:1.5}] },
+  xuenv:   { id:'xuenv',  name:'雪女',   icon:'👻', lv:20, hp:400, atk:80, def:25, spd:20, exp:420, gold:300,skills:[{name:'寒霜',type:'magic',power:1.7}] },
+  /* 火山 · 顶级 */
+  huoya:   { id:'huoya',  name:'火鸦',   icon:'🔥', lv:25, hp:600, atk:110,def:30, spd:20, exp:650, gold:450,skills:[{name:'火羽',type:'magic',power:1.6}] },
+  rongyan: { id:'rongyan',name:'熔岩兽', icon:'🌋', lv:28, hp:800, atk:130,def:45, spd:12, exp:800, gold:600,skills:[] },
+  yanmo:   { id:'yanmo',  name:'炎魔',   icon:'😈', lv:32, hp:1100,atk:170,def:50, spd:16, exp:1200,gold:900,skills:[{name:'焚天',type:'magic',power:2.0}] },
+};
+
+/* ============================================================
+   召唤兽（灵宠）数据
+   ============================================================ */
+const PETS = [
+  { id:'huahua',name:'小花仙',   icon:'🌸', price:500,  hp:120, atk:16, def:10, spd:14, desc:'温柔的百花仙子' },
+  { id:'linghu',name:'九尾灵狐', icon:'🦊', price:2000, hp:200, atk:30, def:14, spd:20, desc:'机敏的九尾妖狐' },
+  { id:'hupo',  name:'琥珀虎',   icon:'🐯', price:5000, hp:380, atk:52, def:28, spd:16, desc:'威猛的琥珀神虎' },
+  { id:'xiaolong',name:'玄霜幼龙',icon:'🐲',price:12000,hp:600, atk:80, def:42, spd:18, desc:'血脉高贵的幼年霜龙' },
+  { id:'jinwu', name:'金乌',     icon:'🐦', price:30000, hp:900, atk:130,def:60, spd:26, desc:'身负太阳真火的神鸟' },
+];
+
+/* ============================================================
+   玩家状态
+   ============================================================ */
+const P = {
+  name: '无名侠客',
+  sect: null,
+  lv: 1,
+  exp: 0,
+  hp: 100, maxHp: 100,
+  mp: 50,  maxMp: 50,
+  atk: 15, def: 8, spd: 12, magic: 10,
+  gold: 100,
+  x: 0, y: 0,
+  scene: '长安城',
+  subScene: '中心广场',
+  bag: {},
+  pet: null,
+  petBox: [],
+  steps: 0,
+  battles: 0,
+  quest: null,
+  questDone: 0,
+  flags: {},
+};
+
+/* 经验公式 */
+function expNeed(){
+  return Math.floor(60 * Math.pow(P.lv, 1.65));
+}
+
+/* 获得经验 */
+function gainExp(amount){
+  P.exp += amount;
+  let leveled = false;
+  while (P.exp >= expNeed()){
+    P.exp -= expNeed();
+    P.lv++;
+    const s = SECTS.find(x => x.id === P.sect);
+    if (s){
+      P.maxHp += Math.floor(s.grow.hp);
+      P.maxMp += Math.floor(s.grow.mp);
+      P.atk   += Math.floor(s.grow.atk);
+      P.def   += Math.floor(s.grow.def);
+      P.spd   += Math.floor(s.grow.spd);
+      P.magic += Math.floor(s.grow.magic);
+      P.hp = P.maxHp;
+      P.mp = P.maxMp;
+    }
+    leveled = true;
+    // 检查新技能
+    const skills = getSectSkills().filter(sk => sk.lv === P.lv);
+    skills.forEach(sk => {
+      toast(`📖 领悟了【${sk.name}】！`);
+      addLog(`【升级】领悟新技能：${sk.name}`, 'good');
+    });
+  }
+  if (leveled){
+    toast(`🌟 等级提升！当前 Lv.${P.lv}`);
+    updateHUD();
+  }
+}
+
+/* 获取门派技能 */
+function getSectSkills(){
+  if (!P.sect) return [];
+  const s = SECTS.find(x => x.id === P.sect);
+  return s ? s.skills.filter(sk => sk.lv <= P.lv) : [];
+}
+
+/* ============================================================
+   日志（主界面下方浮动，简化为 toast 队列）
+   ============================================================ */
+const logQueue = [];
+function addLog(text, cls = ''){
+  logQueue.push({ text, cls, time: Date.now() });
+  // 保留最近20条
+  if (logQueue.length > 20) logQueue.shift();
+}
+
+/* ============================================================
+   门派选择
+   ============================================================ */
+let pendingSect = null;
+
+function renderSectSelect(){
+  const body = $('sectBody');
+  body.innerHTML = '';
+  
+  const tip = document.createElement('div');
+  tip.style.cssText = 'text-align:center;font-size:12px;color:#ffd060;letter-spacing:3px;margin-bottom:14px;text-shadow:0 1px 0 #000';
+  tip.innerHTML = '少侠初入江湖，请择一门派投之';
+  body.appendChild(tip);
+  
+  const list = document.createElement('div');
+  list.style.cssText = 'display:flex;flex-direction:column;gap:8px';
+  
+  SECTS.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'list-item clickable';
+    card.dataset.sectId = s.id;
+    card.style.cssText = 'padding:11px 12px;border-width:2px';
+    card.innerHTML = `
+      <div class="li-icon" style="font-size:26px;width:46px;height:46px;background:radial-gradient(circle at 50% 35%,${s.color}44,transparent 70%),linear-gradient(180deg,rgba(90,50,24,.6),rgba(40,20,8,.6));border-color:${s.color}66">
+        ${s.icon}
+      </div>
+      <div class="li-body">
+        <div class="li-name" style="color:${s.color};font-size:13.5px;text-shadow:0 1px 0 #000,0 0 6px ${s.color}66">${s.name}</div>
+        <div class="li-desc" style="margin-top:4px">${s.desc}</div>
+        <div style="margin-top:5px;font-size:9.5px;color:#c0a870;line-height:1.4">
+          气血${s.base.hp} · 法力${s.base.mp} · 攻击${s.base.atk} · 防御${s.base.def}
+        </div>
+        <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:3px">
+          ${s.skills.map(k=>`<span style="font-size:9px;padding:1px 6px;background:rgba(240,200,96,.15);border:1px solid rgba(240,200,96,.35);border-radius:8px;color:#ffe8a0">${k.name}</span>`).join('')}
+        </div>
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      $$('#sectBody .list-item').forEach(el => {
+        el.style.background = 'linear-gradient(180deg,rgba(255,220,160,.08),rgba(0,0,0,.25))';
+        el.style.borderColor = 'rgba(240,200,96,.22)';
+      });
+      card.style.background = 'linear-gradient(180deg,rgba(240,200,96,.22),rgba(0,0,0,.35))';
+      card.style.borderColor = 'rgba(240,200,96,.65)';
+      pendingSect = s.id;
+      $('btnSectConfirm').disabled = false;
+    });
+    list.appendChild(card);
+  });
+  
+  body.appendChild(list);
+}
+
+/* 确认选择门派 */
+$('btnSectConfirm').addEventListener('click', () => {
+  if (!pendingSect) return;
+  chooseSect(pendingSect);
+});
+
+function chooseSect(id){
+  const s = SECTS.find(x => x.id === id);
+  if (!s) return;
+  
+  P.sect = id;
+  P.maxHp = s.base.hp;
+  P.maxMp = s.base.mp;
+  P.atk   = s.base.atk;
+  P.def   = s.base.def;
+  P.spd   = s.base.spd;
+  P.magic = s.base.magic;
+  P.hp = P.maxHp;
+  P.mp = P.maxMp;
+  
+  $('modalSect').classList.remove('show');
+  $('pSect').textContent = s.name;
+  
+  toast(`🎋 你拜入了 ${s.name}，从此踏上修仙之路`);
+  addLog(`【门派】拜入 ${s.name}`, 'good');
+  addLog(`【提示】使用方向键在长安城中行走，前往野外历练。`, 'dim');
+  
+  updateHUD();
+  renderWorld();
+  startGameLoop();
+}
+
+/* ============================================================
+   HUD 更新
+   ============================================================ */
+function updateHUD(){
+  $('pName').textContent = P.name;
+  const sect = SECTS.find(s => s.id === P.sect);
+  $('pSect').textContent = sect ? sect.name : '无门无派';
+  $('pLv').innerHTML = `Lv.<b>${P.lv}</b>`;
+  
+  const hpP = clamp(P.hp / P.maxHp * 100, 0, 100);
+  const mpP = clamp(P.mp / P.maxMp * 100, 0, 100);
+  const exP = clamp(P.exp / expNeed() * 100, 0, 100);
+  $('hpFill').style.width = hpP + '%';
+  $('mpFill').style.width = mpP + '%';
+  $('expFill').style.width = exP + '%';
+  $('hpText').textContent = Math.ceil(P.hp);
+  $('hpMax').textContent = P.maxHp;
+  $('mpText').textContent = Math.ceil(P.mp);
+  $('mpMax').textContent = P.maxMp;
+  $('expText').textContent = P.exp;
+  $('expMax').textContent = expNeed();
+  
+  $('goldVal').textContent = fmt(P.gold);
+}
+
+/* ============================================================
+   toast 提示
+   ============================================================ */
+let toastTimer = null;
+function toast(msg){
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+/* ============================================================
+   场景大字提示（切场景时）
+   ============================================================ */
+let bannerTimer = null;
+function showBanner(text){
+  const el = $('sceneBanner');
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(() => el.classList.remove('show'), 1500);
+}
+
+/* ============================================================
+   弹窗系统
+   ============================================================ */
+function openModal(id){ $(id).classList.add('show'); }
+function closeModal(id){ $(id).classList.remove('show'); }
+
+/* 绑定所有弹窗关闭按钮 */
+document.addEventListener('click', e => {
+  const closeTarget = e.target.closest('[data-close]');
+  if (closeTarget){
+    closeModal(closeTarget.dataset.close);
+  }
+});
+/* 点击遮罩关闭 */
+$$('.modal').forEach(m => {
+  m.addEventListener('click', e => {
+    if (e.target === m && m.id !== 'modalSect'){
+      m.classList.remove('show');
+    }
+  });
+});
+
+/* ============================================================
+   底部菜单绑定
+   ============================================================ */
+$$('.menu-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const menu = btn.dataset.menu;
+    if (menu === 'char')  openCharPanel();
+    if (menu === 'bag')   openBagPanel();
+    if (menu === 'skill') openSkillPanel();
+    if (menu === 'pet')   openPetPanel();
+    if (menu === 'task')  openTaskPanel();
+  });
+});
+
+/* ============================================================
+   人物面板
+   ============================================================ */
+function openCharPanel(){
+  const body = $('charBody');
+  const sect = SECTS.find(s => s.id === P.sect);
+  
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:12px;padding:10px;background:linear-gradient(180deg,rgba(240,200,96,.12),transparent);border:1.5px solid rgba(240,200,96,.3);border-radius:8px">
+      <div style="font-size:20px;margin-bottom:4px">${sect ? sect.icon : '🧝'}</div>
+      <div style="font-size:15px;color:#ffe8a0;font-weight:bold;letter-spacing:2px;text-shadow:0 1px 0 #000">${P.name}</div>
+      <div style="margin-top:5px">
+        <span style="font-size:11px;padding:2px 10px;background:linear-gradient(180deg,${sect?sect.color:'#6a4a28'},${sect?sect.color+'88':'#3a1f0e'});border:1px solid #1a0e04;border-radius:10px;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.4);box-shadow:0 1px 0 rgba(0,0,0,.5)">${sect?sect.name:'无门无派'}</span>
+      </div>
+      <div style="font-size:11px;color:#c0a870;margin-top:6px;letter-spacing:1px">等级 <b style="color:#ffe8a0;font-size:13px">Lv.${P.lv}</b>  ·  已走 <b style="color:#ffe8a0">${P.steps}</b> 步</div>
+    </div>
+    
+    <div class="section-title"><span class="sti">⚔️</span>基础属性</div>
+    <div class="stat-grid">
+      <div class="stat-box hp">
+        <span class="sk"><span class="ski">❤️</span>气血</span>
+        <span class="sv">${Math.ceil(P.hp)}<small>/${P.maxHp}</small></span>
+      </div>
+      <div class="stat-box mp">
+        <span class="sk"><span class="ski">💠</span>法力</span>
+        <span class="sv">${Math.ceil(P.mp)}<small>/${P.maxMp}</small></span>
+      </div>
+      <div class="stat-box">
+        <span class="sk"><span class="ski">🗡️</span>攻击</span>
+        <span class="sv">${P.atk}</span>
+      </div>
+      <div class="stat-box">
+        <span class="sk"><span class="ski">🛡️</span>防御</span>
+        <span class="sv">${P.def}</span>
+      </div>
+      <div class="stat-box">
+        <span class="sk"><span class="ski">👟</span>速度</span>
+        <span class="sv">${P.spd}</span>
+      </div>
+      <div class="stat-box">
+        <span class="sk"><span class="ski">✨</span>灵力</span>
+        <span class="sv">${P.magic}</span>
+      </div>
+      <div class="stat-box gold">
+        <span class="sk"><span class="ski">💰</span>银两</span>
+        <span class="sv">${fmt(P.gold)}</span>
+      </div>
+      <div class="stat-box exp">
+        <span class="sk"><span class="ski">⭐</span>经验</span>
+        <span class="sv">${fmt(P.exp)}<small>/${fmt(expNeed())}</small></span>
+      </div>
+    </div>
+    
+    <div class="section-title"><span class="sti">✨</span>已学技能</div>
+    <div id="charSkillList"></div>
+  `;
+  
+  // 渲染已学技能
+  const sl = body.querySelector('#charSkillList');
+  const skills = getSectSkills();
+  if (!skills.length){
+    sl.innerHTML = '<div class="empty-tip"><span class="ei">✨</span>尚未习得任何技能</div>';
+  } else {
+    skills.forEach(sk => {
+      const it = document.createElement('div');
+      it.className = 'list-item';
+      it.innerHTML = `
+        <div class="li-icon" style="color:#ffe8a0;font-size:18px">${sk.type==='magic'?'🔮':sk.type==='phys'?'⚔️':sk.type==='heal'?'💚':'🔒'}</div>
+        <div class="li-body">
+          <div class="li-name">${sk.name}</div>
+          <div class="li-desc">${sk.desc}</div>
+        </div>
+        <div class="li-right" style="color:#80c0ff">${sk.mp}<small>法力</small></div>
+      `;
+      sl.appendChild(it);
+    });
+  }
+  
+  openModal('modalChar');
+}
+
+/* ============================================================
+   ↓↓↓ 第 4 批结束，第 5 批将接续：背包 / 技能 / 召唤兽 / 任务面板
+   ============================================================ */
+/* ============================================================
+   梦幻西游 · Q版像素单机  —— 第 5 批
+   背包面板 / 技能面板 / 召唤兽面板 / 任务面板
+   ============================================================ */
+
+/* ============================================================
+   背包面板
+   ============================================================ */
+let bagFilter = 'all'; // all / potion / gem / exp / special
+
+function openBagPanel(){
+  renderBagPanel();
+  openModal('modalBag');
+}
+
+function renderBagPanel(){
+  const body = $('bagBody');
+  const keys = Object.keys(P.bag).filter(k => P.bag[k] > 0);
+  
+  // 计算容量
+  const used = keys.length;
+  const cap = 20;
+  
+  let html = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:6px 10px;background:linear-gradient(180deg,rgba(240,200,96,.12),transparent);border:1.5px solid rgba(240,200,96,.3);border-radius:6px">
+      <span style="font-size:11px;color:#c0a870">🎒 背包容量</span>
+      <span style="font-size:12px;color:#ffe8a0;font-weight:bold;text-shadow:0 1px 0 #000">${used} / ${cap}</span>
+    </div>
+    <div style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap">
+      <button class="btn small ${bagFilter==='all'?'primary':''}" data-filter="all">全部</button>
+      <button class="btn small ${bagFilter==='potion'?'primary':''}" data-filter="potion">药品</button>
+      <button class="btn small ${bagFilter==='gem'?'primary':''}" data-filter="gem">宝石</button>
+      <button class="btn small ${bagFilter==='exp'?'primary':''}" data-filter="exp">修炼</button>
+      <button class="btn small ${bagFilter==='special'?'primary':''}" data-filter="special">特殊</button>
+    </div>
+  `;
+  
+  // 过滤
+  let displayKeys = keys;
+  if (bagFilter !== 'all'){
+    displayKeys = keys.filter(k => ITEMS[k] && ITEMS[k].type === bagFilter);
+  }
+  
+  if (!displayKeys.length){
+    html += `<div class="empty-tip"><span class="ei">🎒</span>${keys.length?'此分类下暂无物品':'背包空空如也'}</div>`;
+  } else {
+    html += '<div id="bagItems"></div>';
+  }
+  
+  body.innerHTML = html;
+  
+  // 绑定过滤按钮
+  body.querySelectorAll('[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      bagFilter = btn.dataset.filter;
+      renderBagPanel();
+    });
+  });
+  
+  // 渲染物品
+  if (displayKeys.length){
+    const list = body.querySelector('#bagItems');
+    displayKeys.forEach(id => {
+      const it = ITEMS[id];
+      if (!it) return;
+      const rare = it.rare || 0;
+      const itEl = document.createElement('div');
+      itEl.className = 'list-item' + (rare>=1?` rare-${rare}`:'');
+      itEl.innerHTML = `
+        <div class="li-icon" style="font-size:22px">${it.icon}</div>
+        <div class="li-body">
+          <div class="li-name">${it.name}<span class="li-count">×${P.bag[id]}</span></div>
+          <div class="li-desc">${it.desc}</div>
+        </div>
+      `;
+      const btn = document.createElement('button');
+      btn.className = 'li-btn';
+      btn.textContent = it.type === 'gem' ? '镶嵌' : '使用';
+      btn.addEventListener('click', () => {
+        useItem(id);
+        renderBagPanel();
+      });
+      itEl.appendChild(btn);
+      list.appendChild(itEl);
+    });
+  }
+}
+
+/* 使用物品 */
+function useItem(id){
+  if (!P.bag[id] || P.bag[id] <= 0) return;
+  const it = ITEMS[id];
+  if (!it || !it.use) return;
+  
+  const result = it.use();
+  P.bag[id]--;
+  if (P.bag[id] <= 0) delete P.bag[id];
+  
+  toast(`${it.icon} ${it.name}：${result}`);
+  addLog(`【使用】${it.name} · ${result}`, 'good');
+  updateHUD();
+  renderWorld();
+}
+
+/* ============================================================
+   技能面板
+   ============================================================ */
+function openSkillPanel(){
+  const body = $('skillBody');
+  const sect = SECTS.find(s => s.id === P.sect);
+  
+  if (!sect){
+    body.innerHTML = '<div class="empty-tip"><span class="ei">✨</span>尚未拜入任何门派</div>';
+    openModal('modalSkill');
+    return;
+  }
+  
+  let html = `
+    <div style="text-align:center;margin-bottom:12px;padding:10px;background:linear-gradient(180deg,${sect.color}22,transparent);border:1.5px solid ${sect.color}55;border-radius:8px">
+      <div style="font-size:22px">${sect.icon}</div>
+      <div style="font-size:14px;color:${sect.color};font-weight:bold;letter-spacing:2px;margin-top:4px;text-shadow:0 1px 0 #000">${sect.name}</div>
+      <div style="font-size:10.5px;color:#c0a870;margin-top:4px">${sect.longDesc}</div>
+    </div>
+    <div class="section-title"><span class="sti">✨</span>门派技能</div>
+  `;
+  
+  sect.skills.forEach(sk => {
+    const learned = sk.lv <= P.lv;
+    const it = document.createElement('div');
+    it.className = 'list-item';
+    if (!learned){
+      it.style.opacity = '0.45';
+      it.style.filter = 'grayscale(.5)';
+    } else if (sk.type === 'magic') it.classList.add('rare-1');
+    else if (sk.type === 'heal') it.classList.add('rare-2');
+    else if (sk.power >= 3) it.classList.add('rare-3');
+    
+    const typeIcon = sk.type==='magic'?'🔮':sk.type==='phys'?'⚔️':sk.type==='heal'?'💚':'🔒';
+    const typeName = sk.type==='magic'?'法术':sk.type==='phys'?'物理':sk.type==='heal'?'治疗':'封印';
+    
+    it.innerHTML = `
+      <div class="li-icon" style="font-size:20px">${learned?typeIcon:'🔒'}</div>
+      <div class="li-body">
+        <div class="li-name" style="color:${learned?(sk.type==='magic'?'#80c0ff':sk.type==='heal'?'#80ffa0':'#ffe8a0'):'#8a7050'}">
+          ${sk.name}
+          ${learned?'':`<span style="font-size:9.5px;color:#c08060;margin-left:5px">Lv.${sk.lv} 解锁</span>`}
+        </div>
+        <div class="li-desc">${sk.desc}</div>
+        <div style="margin-top:4px;font-size:9.5px;color:#c0a870">
+          <span style="color:#80d0ff">【${typeName}】</span>
+          ${sk.target==='all'?' 群体':' 单体'}
+        </div>
+      </div>
+      <div class="li-right" style="color:#80c0ff">${sk.mp}<small>法力</small></div>
+    `;
+    body.appendChild(it);
+  });
+  
+  body.insertAdjacentHTML('afterbegin', html);
+  
+  // 属性加成说明
+  const statTip = document.createElement('div');
+  statTip.style.cssText = 'margin-top:12px;padding:10px;background:linear-gradient(180deg,rgba(240,200,96,.08),transparent);border:1.5px solid rgba(240,200,96,.25);border-radius:6px;font-size:10.5px;color:#c0a870;line-height:1.7';
+  statTip.innerHTML = `
+    <div style="color:#ffe8a0;font-weight:bold;letter-spacing:2px;margin-bottom:5px">📊 门派成长</div>
+    每级成长：气血 +${Math.floor(sect.grow.hp)} · 法力 +${Math.floor(sect.grow.mp)} · 攻击 +${Math.floor(sect.grow.atk)} · 防御 +${Math.floor(sect.grow.def)} · 速度 +${Math.floor(sect.grow.spd)} · 灵力 +${Math.floor(sect.grow.magic)}
+  `;
+  body.appendChild(statTip);
+  
+  openModal('modalSkill');
+}
+
+/* ============================================================
+   召唤兽面板
+   ============================================================ */
+let petTab = 'current'; // current / shop
+
+function openPetPanel(){
+  renderPetPanel();
+  openModal('modalPet');
+}
+
+function renderPetPanel(){
+  const body = $('petBody');
+  
+  let html = `
+    <div style="display:flex;gap:4px;margin-bottom:12px">
+      <button class="btn small ${petTab==='current'?'primary':''}" data-ptab="current" style="flex:1">我的召唤兽</button>
+      <button class="btn small ${petTab==='shop'?'primary':''}" data-ptab="shop" style="flex:1">灵兽园</button>
+    </div>
+  `;
+  
+  body.innerHTML = html;
+  
+  body.querySelectorAll('[data-ptab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      petTab = btn.dataset.ptab;
+      renderPetPanel();
+    });
+  });
+  
+  const content = document.createElement('div');
+  
+  if (petTab === 'current'){
+    if (P.pet){
+      const p = P.pet;
+      // 当前出战宠物
+      const cur = document.createElement('div');
+      cur.className = 'list-item rare-3';
+      cur.style.cssText = 'padding:12px;border-width:2px';
+      cur.innerHTML = `
+        <div class="li-icon" style="font-size:30px;width:52px;height:52px">${p.icon}</div>
+        <div class="li-body">
+          <div class="li-name" style="font-size:14px">
+            ${p.name}
+            <span style="font-size:10px;color:#80ffa0;margin-left:5px;font-weight:normal">出战中</span>
+          </div>
+          <div class="li-desc" style="margin-top:5px">${p.desc}</div>
+          <div style="margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10.5px">
+            <div style="color:#ff8060">❤️ 气血 ${Math.ceil(p.hp)}/${p.maxHp}</div>
+            <div style="color:#ffd060">🗡️ 攻击 ${p.atk}</div>
+            <div style="color:#80c0ff">🛡️ 防御 ${p.def}</div>
+            <div style="color:#a0ffd0">👟 速度 ${p.spd}</div>
+          </div>
+        </div>
+      `;
+      content.appendChild(cur);
+      
+      // 操作按钮
+      const btns = document.createElement('div');
+      btns.style.cssText = 'display:flex;gap:6px;margin-top:10px';
+      
+      const feedBtn = document.createElement('button');
+      feedBtn.className = 'btn small primary';
+      feedBtn.style.flex = '1';
+      feedBtn.textContent = '🍖 喂食（100两）';
+      feedBtn.disabled = P.gold < 100;
+      feedBtn.addEventListener('click', () => {
+        if (P.gold < 100) return;
+        P.gold -= 100;
+        p.hp = Math.min(p.maxHp, p.hp + Math.floor(p.maxHp*0.5));
+        toast(`🍖 ${p.name} 恢复了气血`);
+        updateHUD();
+        renderPetPanel();
+      });
+      btns.appendChild(feedBtn);
+      
+      const trainBtn = document.createElement('button');
+      trainBtn.className = 'btn small primary';
+      trainBtn.style.flex = '1';
+      trainBtn.textContent = '⚔️ 修炼（300两）';
+      trainBtn.disabled = P.gold < 300;
+      trainBtn.addEventListener('click', () => {
+        if (P.gold < 300) return;
+        P.gold -= 300;
+        p.atk += 2;
+        p.maxHp += 10;
+        p.hp += 10;
+        p.def += 1;
+        toast(`⚔️ ${p.name} 属性提升了！`);
+        updateHUD();
+        renderPetPanel();
+      });
+      btns.appendChild(trainBtn);
+      
+      content.appendChild(btns);
+      
+      // 战斗参数说明
+      const tip = document.createElement('div');
+      tip.style.cssText = 'margin-top:12px;padding:10px;background:linear-gradient(180deg,rgba(240,200,96,.08),transparent);border:1.5px solid rgba(240,200,96,.25);border-radius:6px;font-size:10.5px;color:#c0a870;line-height:1.7';
+      tip.innerHTML = `
+        <div style="color:#ffe8a0;font-weight:bold;letter-spacing:2px;margin-bottom:5px">💡 召唤兽说明</div>
+        出战时会自动协助战斗，优先攻击敌方单体目标。<br>
+        召唤兽气血归零不会消失，战后自动恢复 20% 气血。
+      `;
+      content.appendChild(tip);
+      
+    } else {
+      content.innerHTML = `
+        <div class="empty-tip">
+          <span class="ei">🐾</span>
+          尚未拥有召唤兽<br>
+          <span style="font-size:10.5px;color:#8a7050">前往灵兽园捕捉或购买</span>
+        </div>
+      `;
+    }
+  } else {
+    // 灵兽园
+    const tip = document.createElement('div');
+    tip.style.cssText = 'text-align:center;font-size:11px;color:#ffd060;letter-spacing:2px;margin-bottom:10px;text-shadow:0 1px 0 #000';
+    tip.textContent = '═ 灵 兽 园 ═';
+    content.appendChild(tip);
+    
+    PETS.forEach(p => {
+      const owned = P.pet && P.pet.id === p.id;
+      const it = document.createElement('div');
+      it.className = 'list-item';
+      if (owned) it.classList.add('rare-3');
+      
+      it.innerHTML = `
+        <div class="li-icon" style="font-size:28px;width:48px;height:48px">${p.icon}</div>
+        <div class="li-body">
+          <div class="li-name">${p.name}</div>
+          <div class="li-desc">${p.desc}</div>
+          <div style="margin-top:4px;font-size:10px;color:#c0a870">
+            ❤️${p.hp} · 🗡️${p.atk} · 🛡️${p.def} · 👟${p.spd}
+          </div>
+        </div>
+        <div class="li-right" style="color:#ffd060">${fmt(p.price)}<small>两</small></div>
+      `;
+      
+      const btn = document.createElement('button');
+      btn.className = 'li-btn';
+      if (owned){
+        btn.textContent = '已拥有';
+        btn.disabled = true;
+      } else {
+        btn.textContent = '购买';
+        btn.disabled = P.gold < p.price;
+        btn.addEventListener('click', () => {
+          if (P.gold < p.price) return;
+          P.gold -= p.price;
+          P.pet = {
+            id: p.id, name: p.name, icon: p.icon, desc: p.desc,
+            hp: p.hp, maxHp: p.hp,
+            atk: p.atk, def: p.def, spd: p.spd,
+            lv: P.lv,
+          };
+          toast(`🐾 收服了 ${p.name}！`);
+          addLog(`【召唤兽】收服 ${p.name}`, 'good');
+          updateHUD();
+          renderPetPanel();
+        });
+      }
+      it.appendChild(btn);
+      content.appendChild(it);
+    });
+  }
+  
+  body.appendChild(content);
+}
+
+/* ============================================================
+   任务面板
+   ============================================================ */
+const QUESTS = [
+  { id:'q1', name:'初入江湖',   desc:'击败3只野狼或山贼', target:3, type:'kill_any', reward:{gold:200, exp:100}, icon:'⚔️' },
+  { id:'q2', name:'江湖历练',   desc:'击败10只怪物', target:10, type:'kill_any', reward:{gold:500, exp:300}, icon:'🗡️' },
+  { id:'q3', name:'威震一方',   desc:'击败30只怪物', target:30, type:'kill_any', reward:{gold:1500, exp:1200}, icon:'👑' },
+  { id:'q4', name:'名扬三界',   desc:'击败100只怪物', target:100, type:'kill_any', reward:{gold:5000, exp:5000}, icon:'🏆' },
+];
+
+function openTaskPanel(){
+  renderTaskPanel();
+  openModal('modalTask');
+}
+
+function renderTaskPanel(){
+  const body = $('taskBody');
+  
+  let html = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div class="stat-box gold">
+        <span class="sk"><span class="ski">⚔️</span>累计击杀</span>
+        <span class="sv">${P.battles}</span>
+      </div>
+      <div class="stat-box">
+        <span class="sk"><span class="ski">🏁</span>完成任务</span>
+        <span class="sv">${P.questDone}</span>
+      </div>
+    </div>
+    <div class="section-title"><span class="sti">📜</span>江湖任务</div>
+  `;
+  
+  body.innerHTML = html;
+  
+  QUESTS.forEach(q => {
+    const done = P.flags[q.id];
+    const cur = Math.min(P.battles, q.target);
+    const pct = clamp(cur / q.target * 100, 0, 100);
+    
+    const it = document.createElement('div');
+    it.className = 'list-item';
+    if (done) it.classList.add('rare-3');
+    
+    it.innerHTML = `
+      <div class="li-icon" style="font-size:22px">${q.icon}</div>
+      <div class="li-body">
+        <div class="li-name">
+          ${q.name}
+          ${done?`<span style="font-size:10px;color:#80ffa0;margin-left:5px;font-weight:normal">✓ 已完成</span>`:''}
+        </div>
+        <div class="li-desc">${q.desc}</div>
+        <div style="margin-top:5px;height:8px;background:#180c04;border:1px solid #060302;border-radius:4px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.8)">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#906010,#e0a820,#ffe070);transition:width .3s;box-shadow:0 0 6px rgba(240,184,48,.5)"></div>
+        </div>
+        <div style="margin-top:4px;font-size:10px;color:#c0a870">
+          进度 <b style="color:#ffe8a0">${cur}</b> / ${q.target}
+          · 奖励 <span style="color:#ffd060">💰${q.reward.gold}</span>
+          <span style="color:#f0c860">⭐${q.reward.exp}</span>
+        </div>
+      </div>
+    `;
+    
+    if (!done && cur >= q.target){
+      const btn = document.createElement('button');
+      btn.className = 'li-btn';
+      btn.textContent = '领取';
+      btn.addEventListener('click', () => {
+        P.flags[q.id] = true;
+        P.questDone++;
+        P.gold += q.reward.gold;
+        gainExp(q.reward.exp);
+        toast(`🎉 完成【${q.name}】！+${q.reward.gold}两 +${q.reward.exp}经验`);
+        addLog(`【任务】完成 ${q.name}`, 'good');
+        updateHUD();
+        renderTaskPanel();
+      });
+      it.appendChild(btn);
+    } else if (done){
+      const tag = document.createElement('div');
+      tag.className = 'li-right';
+      tag.style.color = '#80ffa0';
+      tag.innerHTML = '已领';
+      it.appendChild(tag);
+    }
+    
+    body.appendChild(it);
+  });
+}
+
+/* ============================================================
+   ↓↓↓ 第 5 批结束，第 6 批将接续：世界生成 / 渲染 / 移动系统
+   ============================================================ */
+
+/* ============================================================
+   梦幻西游 · Q版像素单机  —— 第 6 批
+   世界生成 / 地形渲染 / 玩家移动 / 场景切换
+   ============================================================ */
+
+/* ================= 常量 ================= */
+const TILE = 52;                 // 每个格子像素（放大地图显示）
+const VIEW_PAD = 3;              // 视口外多渲染几格
+const world = $('world');
+const stage = $('stage');
+
+/* ================= 场景定义（区域中心） ================= */
+const SCENES = [
+  { id:'changan',  name:'长安城',    cx:0,   cy:0,   radius:18, lv:1,  danger:0,
+    biome:'town',    desc:'大唐国都，繁华似锦' },
+  { id:'jiangnan', name:'江南野外',  cx:0,   cy:-55, radius:34, lv:5,  danger:3,
+    biome:'plain',   desc:'鱼米之乡，草木葱茏' },
+  { id:'datang',   name:'大唐境外',  cx:75,  cy:-40, radius:38, lv:11, danger:5,
+    biome:'desert',  desc:'黄沙漫天，商旅难行' },
+  { id:'beiju',    name:'北俱芦洲',  cx:-75, cy:-50, radius:42, lv:17, danger:7,
+    biome:'snow',    desc:'冰雪覆盖的极北之地' },
+  { id:'huoyan',   name:'火焰山',    cx:0,   cy:95,  radius:40, lv:26, danger:9,
+    biome:'volcano', desc:'烈焰熊熊，寸草不生' },
+];
+
+/* ================= 地形缓存 ================= */
+const tileCache = new Map();
+
+/* 判断某坐标属于哪个场景 */
+function getSceneAt(x, y){
+  let best = null, bestD = Infinity;
+  for (const s of SCENES){
+    const d = Math.hypot(x - s.cx, y - s.cy);
+    if (d < s.radius && d < bestD){ best = s; bestD = d; }
+  }
+  return best;
+}
+
+/* 判断是否城镇（长安城） */
+function isTown(x, y){
+  const d = Math.hypot(x, y);
+  return d < 10;
+}
+
+/* ================= 生成瓦片 ================= */
+function getTile(x, y){
+  const key = x + ',' + y;
+  if (tileCache.has(key)) return tileCache.get(key);
+  
+  const scene = getSceneAt(x, y);
+  const distOrigin = Math.hypot(x, y);
+  let tile;
+  
+  if (isTown(x, y)){
+    /* ---- 长安城 ---- */
+    const dt = Math.hypot(x, y);
+    if (dt < 4.5){
+      // 中心广场
+      tile = (Math.abs(x) < 1 && Math.abs(y) < 1) ? 'floor-center' : 'floor';
+      // 中心石碑
+      if (x === 0 && y === -2) tile = 'build-memorial';
+      // 摊位
+      if ((x === -3 && y === 1) || (x === 3 && y === 1)) tile = 'build-stall';
+    } else if (dt < 8){
+      // 内城街区
+      const n = noise2(x*0.5, y*0.5, 11);
+      if (n > 0.78) tile = 'build-house';
+      else if (n > 0.7)  tile = 'build-shop';
+      else if (n < 0.2)  tile = 'path';
+      else tile = 'floor';
+    } else {
+      // 外城墙 + 城门
+      if (dt < 10.5){
+        const angle = Math.atan2(y, x);
+        // 四座城门
+        const gateAngles = [0, Math.PI/2, Math.PI, -Math.PI/2];
+        let isGate = false;
+        for (const ga of gateAngles){
+          if (Math.abs(angle - ga) < 0.18) { isGate = true; break; }
+        }
+        if (isGate) tile = 'path';
+        else if (Math.abs(dt - 9.5) < 0.6) tile = 'wall';
+        else tile = 'floor';
+      } else {
+        tile = 'grass';
+      }
+    }
+  } else if (scene){
+    /* ---- 野外场景 ---- */
+    const biome = scene.biome;
+    const n1 = noise2(x*0.18, y*0.18, 21);
+    const n2 = noise2(x*0.32, y*0.32, 22);
+    const n3 = noise2(x*0.09, y*0.09, 23);
+    
+    // 场景边缘淡出
+    const d = Math.hypot(x - scene.cx, y - scene.cy);
+    const edge = clamp(1 - (d - scene.radius*0.7) / (scene.radius*0.3), 0, 1);
+    
+    if (biome === 'plain'){
+      if (n3 > 0.90) tile = 'water';
+      else if (n1 > 0.80) tile = 'tree';
+      else if (n1 < 0.12) tile = 'flower';
+      else if (n2 > 0.88)  tile = 'rock';
+      else tile = n2 > 0.5 ? 'grass' : 'grass2';
+    } else if (biome === 'desert'){
+      if (n1 > 0.90) tile = 'rock';
+      else if (n1 < 0.05) tile = 'tree'; // 仙人掌用树代替
+      else if (n3 > 0.94) tile = 'water';
+      else tile = 'sand';
+    } else if (biome === 'snow'){
+      if (n1 > 0.86) tile = 'tree';
+      else if (n2 > 0.91) tile = 'rock';
+      else if (n3 > 0.95) tile = 'water';
+      else tile = 'snow';
+    } else if (biome === 'volcano'){
+      if (n3 > 0.88) tile = 'lava';
+      else if (n1 > 0.82) tile = 'rock';
+      else tile = 'sand'; // 焦土
+    }
+    // 场景外圈淡出为草地
+    if (edge < 1 && hash(x, y, 991) > 0.5) tile = 'grass';
+  } else {
+    /* ---- 荒野过渡区 ---- */
+    const n1 = noise2(x*0.14, y*0.14, 31);
+    const n2 = noise2(x*0.3, y*0.3, 32);
+    if (n1 > 0.88) tile = 'tree';
+    else if (n1 < 0.06) tile = 'water';
+    else if (n2 > 0.88) tile = 'rock';
+    else if (n2 < 0.2) tile = 'flower';
+    else tile = (n2 > 0.5) ? 'grass' : 'grass2';
+  }
+  
+  tileCache.set(key, tile);
+  return tile;
+}
+
+/* ================= 建筑/NPC装饰图标 ================= */
+const TILE_ICON = {
+  'build-memorial': { icon:'🏛️', name:'长安石碑', type:'npc',  action:'readMemorial' },
+  'build-stall':    { icon:'🏪', name:'杂货摊',   type:'shop',  action:'openShop' },
+  'build-house':    { icon:'🏠', name:'民宅',     type:'build', action:null },
+  'build-shop':     { icon:'🏦', name:'钱庄',     type:'build', action:null },
+};
+
+/* 场景装饰图标（随机散落） */
+function getDecor(x, y, tile){
+  if (tile === 'tree')   return '🌲';
+  if (tile === 'rock')   return '🪨';
+  if (tile === 'flower') return '🌺';
+  if (tile === 'water')  return '';
+  if (tile === 'sand' && hash(x,y,88) > 0.9) return '🌵';
+  if (tile === 'lava')   return '🔥';
+  if (tile === 'snow' && hash(x,y,89) > 0.92) return '❄️';
+  return '';
+}
+
+/* ================= 判断是否可走 ================= */
+function isWalkable(x, y){
+  // 严格执行：只有水面不可走，其余所有地形都可走。
+  return getTile(x, y) !== 'water';
+}
+
+/* ================= 野外地图怪物 =================
+   怪物直接显示在地图上，不占用碰撞格。
+   使用固定哈希，让同一坐标在重绘后仍显示同一种怪物。
+*/
+function getMapMonster(x, y){
+  if (isTown(x, y)) return null;
+  if (getTile(x, y) === 'water') return null;
+
+  // 控制怪物密度：约每 8x8 格出现一个显示点
+  const h = hash(x, y, 701);
+  if (h < 0.84) return null;
+
+  const scene = getSceneAt(x, y);
+  let pool;
+  if (!scene){
+    pool = ['lang','shanzei','liukou'];
+  } else if (scene.id === 'jiangnan'){
+    pool = ['shuyao','chimang','linghu'];
+  } else if (scene.id === 'datang'){
+    pool = ['shamo','shadao','xieyan'];
+  } else if (scene.id === 'beiju'){
+    pool = ['xuelang','bingpo','xuenv'];
+  } else if (scene.id === 'huoyan'){
+    pool = ['huoya','rongyan','yanmo'];
+  } else {
+    pool = ['lang'];
+  }
+
+  const index = Math.floor(hash(x, y, 702) * pool.length) % pool.length;
+  return MOBS[pool[index]] || null;
+}
+
+/* ================= 怪物地图图片 ================= */
+function makeMonsterImage(mob){
+  // 使用内嵌 SVG 生成独立图片，不依赖网络图片地址，手机和电脑都能显示。
+  const colors = {
+    lang:['#6b4a2f','#d7a36b'], shanzei:['#5b3b25','#c88a4a'], liukou:['#3a2930','#9b5960'],
+    shuyao:['#2f6b35','#7fbe58'], chimang:['#8d2d32','#e26b57'], linghu:['#b86b35','#ffd18a'],
+    shamo:['#806238','#d6ad6b'], shadao:['#70452c','#d79b58'], xieyan:['#7b2b1e','#ff7a45'],
+    xuelang:['#53677a','#dcecff'], bingpo:['#3c78a8','#a9eaff'], xuenv:['#53608f','#e6edff'],
+    huoya:['#8a3d22','#ffb13b'], rongyan:['#4f3328','#ff6b3d'], yanmo:['#4a2028','#ff4f4f']
+  };
+  const c = colors[mob.id] || ['#4b4b4b','#dddddd'];
+  const icon = String(mob.icon || '👾').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const svg = `<svg xmlns=\"http://www.w3.org/2000/svg\" width=48 height=48 viewBox=\"0 0 48 48\">`+
+    `<rect x=2 y=2 width=44 height=44 rx=7 fill=\"${c[0]}\" stroke=\"#160d08\" stroke-width=3/>`+
+    `<circle cx=24 cy=23 r=16 fill=\"${c[1]}\" opacity=\".92\"/>`+
+    `<text x=24 y=31 text-anchor=\"middle\" font-size=23 font-family=\"Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif\">${icon}</text>`+
+    `<path d=\"M10 39h28\" stroke=\"#fff\" stroke-opacity=\".25\" stroke-width=2/>`+
+    `</svg>`;
+  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+}
+
+/* ================= 渲染世界 ================= */
+let lastRenderX = null, lastRenderY = null;
+let cameraX = 0, cameraY = 0;
+
+function renderWorld(){
+  const vw = stage.clientWidth;
+  const vh = stage.clientHeight;
+  if (!vw || !vh) return;
+  
+  // 玩家居中：以玩家为中心渲染
+  const cols = Math.ceil(vw / TILE) + VIEW_PAD * 2;
+  const rows = Math.ceil(vh / TILE) + VIEW_PAD * 2;
+  const startX = P.x - Math.floor(cols / 2);
+  const startY = P.y - Math.floor(rows / 2);
+  
+  // 关键修复：让“逻辑坐标”与“屏幕上的格子”严格对齐。
+  // 之前格子直接从 0,0 排列，玩家虽然固定在屏幕正中央，但 P.x/P.y 对应的格子
+  // 实际并不在玩家脚下，导致画面看着是草地，程序却判断目标格是水。
+  const gridLeft = Math.round(vw / 2 - (P.x - startX + 0.5) * TILE);
+  const gridTop  = Math.round(vh / 2 - (P.y - startY + 0.5) * TILE);
+  
+  const frag = document.createDocumentFragment();
+  
+  for (let dy = 0; dy < rows; dy++){
+    for (let dx = 0; dx < cols; dx++){
+      const wx = startX + dx;
+      const wy = startY + dy;
+      const tile = getTile(wx, wy);
+      
+      const el = document.createElement('div');
+      el.className = 'tile t-' + tile;
+      el.style.left = (gridLeft + dx * TILE) + 'px';
+      el.style.top  = (gridTop + dy * TILE) + 'px';
+      el.style.width  = TILE + 'px';
+      el.style.height = TILE + 'px';
+      
+      // 建筑装饰图标
+      if (TILE_ICON[tile]){
+        const span = document.createElement('span');
+        span.className = TILE_ICON[tile].type === 'npc' || TILE_ICON[tile].type === 'shop' ? 'npc' : 'build';
+        span.textContent = TILE_ICON[tile].icon;
+        el.appendChild(span);
+        el.dataset.tileType = tile;
+        el.dataset.wx = wx;
+        el.dataset.wy = wy;
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          onTileClick(wx, wy, tile);
+        });
+      } else {
+        const deco = getDecor(wx, wy, tile);
+        if (deco){
+          const span = document.createElement('span');
+          span.className = 'deco';
+          span.textContent = deco;
+          el.appendChild(span);
+        }
+      }
+
+      // 地图上直接显示怪物图片和名称；怪物不阻挡玩家移动
+      const mapMob = getMapMonster(wx, wy);
+      if (mapMob && !(wx === P.x && wy === P.y)){
+        const mobEl = document.createElement('div');
+        mobEl.className = 'map-monster';
+        mobEl.title = `${mapMob.name} Lv.${mapMob.lv}`;
+        const img = document.createElement('img');
+        img.className = 'map-monster-img';
+        img.alt = mapMob.name;
+        img.src = makeMonsterImage(mapMob);
+        const name = document.createElement('span');
+        name.className = 'map-monster-name';
+        name.textContent = `${mapMob.name} Lv.${mapMob.lv}`;
+        mobEl.appendChild(img);
+        mobEl.appendChild(name);
+        el.appendChild(mobEl);
+      }
+      
+      frag.appendChild(el);
+    }
+  }
+  
+  world.innerHTML = '';
+  world.appendChild(frag);
+  
+  // 玩家角色
+  renderPlayer(vw, vh);
+  
+  // 更新场景标题
+  updateSceneTitle();
+  
+  lastRenderX = P.x;
+  lastRenderY = P.y;
+}
+
+/* ================= 渲染玩家 ================= */
+function renderPlayer(vw, vh){
+  const px = vw/2 - 22;
+  const py = vh/2 - 26;
+  
+  let pEl = $('player');
+  if (!pEl){
+    pEl = document.createElement('div');
+    pEl.id = 'player';
+    pEl.innerHTML = `
+      <svg viewBox="0 0 16 20" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+        <!-- 阴影由::after处理 -->
+        <!-- 头发 -->
+        <rect x="4" y="0" width="8" height="2" fill="#2a1620"/>
+        <rect x="3" y="2" width="1" height="4" fill="#2a1620"/>
+        <rect x="12" y="2" width="1" height="4" fill="#2a1620"/>
+        <rect x="4" y="2" width="8" height="2" fill="#3a2630"/>
+        <!-- 发带 -->
+        <rect x="3" y="3" width="10" height="1" fill="#4a9a7a"/>
+        <rect x="3" y="3" width="1" height="2" fill="#2a6a52"/>
+        <rect x="12" y="3" width="1" height="2" fill="#2a6a52"/>
+        <!-- 脸 -->
+        <rect x="4" y="2" width="8" height="7" fill="#f5d8b8"/>
+        <!-- 眼 -->
+        <rect x="5" y="5" width="2" height="2" fill="#1a0e18"/>
+        <rect x="9" y="5" width="2" height="2" fill="#1a0e18"/>
+        <rect x="5" y="5" width="1" height="1" fill="#fff"/>
+        <rect x="9" y="5" width="1" height="1" fill="#fff"/>
+        <!-- 腮红 -->
+        <rect x="4" y="7" width="1" height="1" fill="#f0a8a0"/>
+        <rect x="11" y="7" width="1" height="1" fill="#f0a8a0"/>
+        <!-- 嘴 -->
+        <rect x="7" y="7" width="2" height="1" fill="#c87868"/>
+        <!-- 脖子 -->
+        <rect x="7" y="9" width="2" height="1" fill="#e8c0a0"/>
+        <!-- 衣袍 -->
+        <rect x="2" y="10" width="12" height="8" fill="#e8d8b0"/>
+        <!-- 衣领 -->
+        <rect x="6" y="10" width="4" height="1" fill="#4a9a7a"/>
+        <rect x="5" y="11" width="1" height="1" fill="#4a9a7a"/>
+        <rect x="10" y="11" width="1" height="1" fill="#4a9a7a"/>
+        <!-- 外袖 -->
+        <rect x="1" y="11" width="1" height="5" fill="#3a5a80"/>
+        <rect x="14" y="11" width="1" height="5" fill="#3a5a80"/>
+        <!-- 腰带 -->
+        <rect x="3" y="15" width="10" height="1" fill="#3a5a80"/>
+        <rect x="7" y="15" width="2" height="1" fill="#f0c860"/>
+        <!-- 云纹 -->
+        <rect x="3" y="12" width="2" height="1" fill="#c8a860"/>
+        <rect x="11" y="12" width="2" height="1" fill="#c8a860"/>
+        <!-- 腿 -->
+        <rect x="4" y="18" width="3" height="2" fill="#3a5a80"/>
+        <rect x="9" y="18" width="3" height="2" fill="#3a5a80"/>
+        <!-- 靴 -->
+        <rect x="3" y="19" width="4" height="1" fill="#2a1a10"/>
+        <rect x="9" y="19" width="4" height="1" fill="#2a1a10"/>
+      </svg>
+    `;
+    stage.appendChild(pEl);
+  }
+  
+  pEl.style.left = px + 'px';
+  pEl.style.top  = py + 'px';
+}
+
+/* ================= 更新场景标题 ================= */
+function updateSceneTitle(){
+  const scene = getSceneAt(P.x, P.y);
+  const titleEl = $('sceneTitle');
+  
+  if (isTown(P.x, P.y)){
+    const zone = Math.hypot(P.x, P.y) < 4.5 ? '中心广场' : '长安城';
+    titleEl.innerHTML = `长安城 <b>·</b> <i>${zone}</i>`;
+  } else if (scene){
+    titleEl.innerHTML = `${scene.name} <b>·</b> <i>Lv.${scene.lv} 推荐</i>`;
+  } else {
+    titleEl.innerHTML = `荒野 <b>·</b> <i>无主之地</i>`;
+  }
+}
+
+/* ================= 移动系统 ================= */
+let moveLock = false;
+
+function tryMove(dx, dy){
+  // 地图移动的唯一地形碰撞规则：水面。
+  // 战斗界面显示时由战斗界面本身拦截输入；战斗结束后不再使用残留状态锁死地图。
+  const battleOverlay = $('battleOverlay');
+  if (battleOverlay && battleOverlay.classList.contains('show')) return;
+
+  // 只允许四方向单格移动。
+  dx = Math.sign(Number(dx) || 0);
+  dy = Math.sign(Number(dy) || 0);
+  if (dx === 0 && dy === 0) return;
+  if (dx !== 0 && dy !== 0) return;
+
+  const nx = P.x + dx;
+  const ny = P.y + dy;
+  const targetTile = getTile(nx, ny);
+
+  // 唯一碰撞规则：水。
+  // grass / grass2 / flower / tree / rock / sand / snow / lava / 建筑等全部允许通行。
+  if (targetTile === 'water'){
+    toast('🌊 水面无法通行');
+    return;
+  }
+  
+  const prevScene = getSceneAt(P.x, P.y);
+  
+  P.x = nx;
+  P.y = ny;
+  P.steps++;
+  
+  // 行走动画
+  const pEl = $('player');
+  if (pEl){
+    pEl.classList.add('walking');
+    clearTimeout(pEl._walkTimer);
+    pEl._walkTimer = setTimeout(() => pEl.classList.remove('walking'), 300);
+  }
+  
+  renderWorld();
+  updateHUD();
+  
+  // 检查场景切换
+  const curScene = getSceneAt(P.x, P.y);
+  if (curScene && curScene !== prevScene){
+    showBanner(curScene.name);
+    addLog(`【场景】进入 ${curScene.name}（Lv.${curScene.lv}）`, 'dim');
+    toast(`📍 ${curScene.name} · ${curScene.desc}`);
+  } else if (!curScene && prevScene){
+    showBanner('荒野');
+    addLog(`【场景】进入荒野地带`, 'dim');
+  }
+  
+  // 步数事件
+  onStep(nx, ny);
+}
+
+/* ================= 每一步的随机事件 ================= */
+function onStep(x, y){
+  const scene = getSceneAt(x, y);
+  
+  // 城镇内不遇敌
+  if (isTown(x, y)) return;
+  
+  // 每 8 步自动回血回蓝
+  if (P.steps % 8 === 0){
+    if (P.hp < P.maxHp) P.hp = Math.min(P.maxHp, P.hp + Math.floor(P.maxHp * 0.03));
+    if (P.mp < P.maxMp) P.mp = Math.min(P.maxMp, P.mp + Math.floor(P.maxMp * 0.05));
+    updateHUD();
+  }
+  
+  // 遇敌概率
+  let encounterRate = 0.08;
+  if (scene) encounterRate += scene.danger * 0.012;
+  encounterRate = clamp(encounterRate, 0.05, 0.25);
+  
+  // 每走3步才检测一次（避免太快遇敌）
+  if (P.steps % 3 !== 0) return;
+  if (Math.random() > encounterRate) return;
+  
+  // 触发战斗
+  startEncounter(scene);
+}
+
+/* ================= 触发遭遇战 ================= */
+function startEncounter(scene){
+  // 选择怪物
+  let pool;
+  if (!scene){
+    pool = ['lang', 'shanzei', 'liukou'];
+  } else if (scene.id === 'jiangnan'){
+    pool = ['shuyao', 'chimang', 'linghu'];
+  } else if (scene.id === 'datang'){
+    pool = ['shamo', 'shadao', 'xieyan'];
+  } else if (scene.id === 'beiju'){
+    pool = ['xuelang', 'bingpo', 'xuenv'];
+  } else if (scene.id === 'huoyan'){
+    pool = ['huoya', 'rongyan', 'yanmo'];
+  } else {
+    pool = ['lang'];
+  }
+  
+  // 随机数量
+  const count = Math.random() < 0.5 ? 1 : (Math.random() < 0.85 ? 2 : 3);
+  const mobs = [];
+  for (let i = 0; i < count; i++){
+    const id = pool[Math.floor(Math.random() * pool.length)];
+    const mob = JSON.parse(JSON.stringify(MOBS[id]));
+    // 等级浮动
+    const lvOffset = Math.floor(Math.random() * 3) - 1;
+    mob.lv = Math.max(1, mob.lv + lvOffset);
+    // 属性缩放
+    const scale = 1 + (lvOffset * 0.08);
+    mob.hp = Math.floor(mob.hp * scale);
+    mob.atk = Math.floor(mob.atk * scale);
+    mob.maxHp = mob.hp;
+    mobs.push(mob);
+  }
+  
+  // 准备战斗
+  if (typeof battlePrepare === 'function'){
+    battlePrepare(mobs);
+  } else {
+    toast('⚔️ 遭遇敌人！');
+  }
+}
+
+/* ================= 点击瓦片交互 ================= */
+function onTileClick(wx, wy, tile){
+  const info = TILE_ICON[tile];
+  if (!info || !info.action) return;
+  
+  const dist = Math.hypot(wx - P.x, wy - P.y);
+  if (dist > 2.2){
+    toast('距离太远，请靠近一些');
+    return;
+  }
+  
+  // 走到附近
+  if (info.action === 'readMemorial'){
+    toast('📜 长安石碑：三界同心，共御妖魔');
+    addLog('【石碑】三界同心，共御妖魔', 'dim');
+  } else if (info.action === 'openShop'){
+    openShopPanel();
+  }
+}
+
+/* ================= 方向键绑定 ================= */
+$$('#dpad button').forEach(btn => {
+  const dir = btn.dataset.dir;
+  if (!dir) return;
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (dir === 'up')    tryMove(0, -1);
+    if (dir === 'down')  tryMove(0, 1);
+    if (dir === 'left')  tryMove(-1, 0);
+    if (dir === 'right') tryMove(1, 0);
+  });
+});
+
+/* 中心按钮：原地休息 */
+$('btnCenter').addEventListener('click', () => {
+  if (typeof battle !== 'undefined' && battle && battle.active) return;
+  const t = getTile(P.x, P.y);
+  const inTown = isTown(P.x, P.y);
+  const rate = inTown ? 0.08 : 0.04;
+  P.hp = Math.min(P.maxHp, P.hp + Math.floor(P.maxHp * rate));
+  P.mp = Math.min(P.maxMp, P.mp + Math.floor(P.maxMp * rate * 1.5));
+  updateHUD();
+  toast(inTown ? '🏠 客栈小憩，气血法力微复' : '· 原地调息');
+});
+
+/* 键盘移动 */
+const keyMap = {
+  'w':'up','W':'up','ArrowUp':'up',
+  's':'down','S':'down','ArrowDown':'down',
+  'a':'left','A':'left','ArrowLeft':'left',
+  'd':'right','D':'right','ArrowRight':'right',
+};
+document.addEventListener('keydown', e => {
+  // 弹窗打开时忽略
+  if (document.querySelector('.modal.show')) return;
+  if (typeof battle !== 'undefined' && battle && battle.active) return;
+  const dir = keyMap[e.key];
+  if (!dir) return;
+  e.preventDefault();
+  if (dir === 'up')    tryMove(0, -1);
+  if (dir === 'down')  tryMove(0, 1);
+  if (dir === 'left')  tryMove(-1, 0);
+  if (dir === 'right') tryMove(1, 0);
+});
+
+/* 触摸滑动 */
+let touchStartPt = null;
+stage.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) return;
+  touchStartPt = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() };
+}, { passive:true });
+
+stage.addEventListener('touchend', e => {
+  if (!touchStartPt) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - touchStartPt.x;
+  const dy = t.clientY - touchStartPt.y;
+  const dist = Math.hypot(dx, dy);
+  const dur = Date.now() - touchStartPt.t;
+  touchStartPt = null;
+  
+  if (dist < 24 || dur > 800) return;
+  if (typeof battle !== 'undefined' && battle && battle.active) return;
+  if (document.querySelector('.modal.show')) return;
+  
+  if (Math.abs(dx) > Math.abs(dy)){
+    tryMove(dx > 0 ? 1 : -1, 0);
+  } else {
+    tryMove(0, dy > 0 ? 1 : -1);
+  }
+}, { passive:true });
+
+/* ================= 小地图（简化版） ================= */
+$('miniMapBtn').addEventListener('click', () => {
+  openMiniMap();
+});
+
+function openMiniMap(){
+  // 简单方式：在 toast 里显示当前场景位置
+  const scene = getSceneAt(P.x, P.y);
+  let text;
+  if (isTown(P.x, P.y)){
+    text = `🏰 长安城 · 坐标(${P.x},${P.y})`;
+  } else if (scene){
+    text = `${scene.biome==='plain'?'🌾':scene.biome==='desert'?'🏜️':scene.biome==='snow'?'❄️':scene.biome==='volcano'?'🌋':'🌲'} ${scene.name} · 坐标(${P.x},${P.y})`;
+  } else {
+    text = `🌿 荒野 · 坐标(${P.x},${P.y})`;
+  }
+  toast(text);
+  addLog(`【位置】${text}`, 'dim');
+}
+
+/* ================= 场景重绘响应窗口变化 ================= */
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (P.sect) renderWorld();
+  }, 150);
+});
+
+/* ============================================================
+   ↓↓↓ 第 6 批结束，第 7 批将接续：战斗系统 / 商店系统
+   ============================================================ */
+
+/* ============================================================
+   梦幻西游 · Q版像素单机  —— 第 7 批
+   回合制战斗系统 / 坊市商店系统
+   ============================================================ */
+
+/* ==================== 战斗系统 CSS 注入 ==================== */
+(function injectBattleStyle(){
+  const style = document.createElement('style');
+  style.textContent = `
+    /* 战斗覆盖层 */
+    #battleOverlay{
+      position:absolute;inset:0;z-index:200;
+      background:
+        radial-gradient(circle at 50% 20%,rgba(60,20,80,.6),transparent 60%),
+        linear-gradient(180deg,#1a0a26 0%,#2a0f45 45%,#0d0418 100%);
+      display:none;flex-direction:column;
+      padding:8px;gap:6px;
+      opacity:0;transition:opacity .3s;
+    }
+    #battleOverlay.show{display:flex;opacity:1}
+    #battleOverlay.fading{opacity:0}
+
+    /* 战斗场景框 */
+    .battle-scene{
+      flex:1;display:flex;flex-direction:column;gap:6px;
+      min-height:0;
+      position:relative;
+    }
+
+    /* 敌我方阵型 */
+    .battle-row{
+      display:flex;flex-wrap:wrap;justify-content:center;
+      align-content:flex-start;gap:6px;
+      min-height:auto;padding:4px 0;
+    }
+    .battle-row.enemy{align-items:flex-start}
+    .battle-row.player{align-items:flex-end}
+
+    /* 单位卡片 */
+    .battle-unit{
+      position:relative;
+      width:calc(33.333% - 5px);min-width:92px;max-width:150px;
+      background:linear-gradient(180deg,#3a1a5a,#1a0a2e);
+      border:2px solid #000;
+      padding:6px 8px 7px;
+      border-radius:4px;
+      box-shadow:2px 2px 0 rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);
+      transition:all .2s;
+      animation:unitIn .3s cubic-bezier(.25,1.4,.5,1);
+    }
+    @keyframes unitIn{
+      from{opacity:0;transform:scale(.6) translateY(-12px)}
+      to{opacity:1;transform:scale(1) translateY(0)}
+    }
+    .battle-unit.is-player{
+      background:linear-gradient(180deg,#204a80,#0e2040);
+      box-shadow:2px 2px 0 rgba(0,0,0,.5),inset 0 0 0 1px rgba(120,200,255,.4);
+    }
+    .battle-unit.is-pet{
+      background:linear-gradient(180deg,#2a6a3a,#0e2a18);
+      box-shadow:2px 2px 0 rgba(0,0,0,.5),inset 0 0 0 1px rgba(120,255,160,.4);
+    }
+    .battle-unit.dead{
+      opacity:.28;filter:grayscale(1);
+    }
+    .battle-unit.damaged{
+      animation:shake .3s;
+    }
+    @keyframes shake{
+      0%,100%{transform:translateX(0)}
+      25%{transform:translateX(-4px)}
+      75%{transform:translateX(4px)}
+    }
+    .battle-unit.acting{
+      box-shadow:2px 2px 0 rgba(0,0,0,.5),0 0 0 3px var(--gold),0 0 16px rgba(240,200,96,.7);
+      transform:scale(1.05);
+      z-index:5;
+    }
+
+    /* 单位头像+名字 */
+    .bu-head{
+      display:flex;align-items:center;gap:5px;margin-bottom:4px;
+    }
+    .bu-icon{
+      width:26px;height:26px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      font-size:18px;
+      background:radial-gradient(circle at 50% 35%,rgba(255,220,160,.3),transparent 70%);
+      border:1px solid rgba(0,0,0,.5);
+      border-radius:4px;
+    }
+    .bu-name{
+      font-size:11px;font-weight:bold;color:#f0e0ff;
+      text-shadow:1px 1px 0 #000;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      flex:1;min-width:0;
+    }
+    .bu-name small{color:#c0a0e8;font-size:9.5px;font-weight:normal;margin-left:2px}
+    .bu-lv{
+      font-size:9px;color:#ffd060;
+      text-shadow:1px 1px 0 #000;
+      flex-shrink:0;
+    }
+
+    /* 血条 */
+    .bu-hp{
+      height:7px;background:#0d0418;
+      border:1px solid #000;border-radius:4px;
+      overflow:hidden;
+      box-shadow:inset 0 1px 2px rgba(0,0,0,.8);
+      position:relative;
+    }
+    .bu-hp .fill{
+      height:100%;width:100%;
+      background:linear-gradient(90deg,#a02040,#ff5070);
+      transition:width .35s ease;
+      border-radius:3px;
+    }
+    .battle-unit.is-player .bu-hp .fill{
+      background:linear-gradient(90deg,#2080a0,#60d0ff);
+    }
+    .battle-unit.is-pet .bu-hp .fill{
+      background:linear-gradient(90deg,#208040,#60ff90);
+    }
+    .bu-hp-text{
+      font-size:8.5px;color:#c0a0e8;
+      text-align:right;margin-top:2px;
+      text-shadow:1px 1px 0 #000;
+    }
+
+    /* 状态图标 */
+    .bu-status{
+      display:flex;gap:3px;margin-top:3px;
+      font-size:9px;
+    }
+    .bu-status span{
+      padding:1px 4px;background:rgba(0,0,0,.4);
+      border:1px solid #000;border-radius:3px;
+    }
+
+    /* 伤害飘字 */
+    .dmg-float{
+      position:absolute;left:50%;top:0;
+      transform:translateX(-50%);
+      font-size:16px;font-weight:bold;
+      color:#ff4040;
+      text-shadow:1px 1px 0 #000,0 0 8px rgba(255,64,64,.8);
+      pointer-events:none;
+      animation:dmgFloat 1s ease-out forwards;
+      z-index:100;
+      white-space:nowrap;
+    }
+    .dmg-float.heal{color:#80ff90;text-shadow:1px 1px 0 #000,0 0 8px rgba(128,255,144,.8)}
+    .dmg-float.crit{font-size:22px;color:#ffd060;text-shadow:2px 2px 0 #000,0 0 12px rgba(255,208,96,.9)}
+    @keyframes dmgFloat{
+      0%{opacity:0;transform:translateX(-50%) translateY(0) scale(.6)}
+      20%{opacity:1;transform:translateX(-50%) translateY(-12px) scale(1.1)}
+      100%{opacity:0;transform:translateX(-50%) translateY(-40px) scale(1)}
+    }
+
+    /* 战斗日志 */
+    #battleLog{
+      flex:1;min-height:80px;max-height:200px;
+      overflow-y:auto;padding:8px 10px;
+      font-size:12px;line-height:1.7;
+      background:rgba(0,0,0,.5);
+      border:2px solid #000;border-radius:4px;
+      box-shadow:inset 0 2px 4px rgba(0,0,0,.6);
+      scrollbar-width:thin;
+      scrollbar-color:rgba(240,200,96,.45) rgba(0,0,0,.3);
+    }
+    #battleLog::-webkit-scrollbar{width:5px}
+    #battleLog::-webkit-scrollbar-track{background:#0d0418}
+    #battleLog::-webkit-scrollbar-thumb{
+      background:linear-gradient(180deg,var(--gold),var(--gold-dk));
+      border-radius:3px;
+    }
+    .blog{
+      margin-bottom:2px;
+      animation:blogIn .22s ease;
+    }
+    @keyframes blogIn{from{opacity:0;transform:translateY(3px)}to{opacity:1}}
+    .blog.good{color:#88ffa8}
+    .blog.bad{color:#ff7090}
+    .blog.warn{color:#ffd060}
+    .blog.dim{color:#8a7aa8}
+    .blog.round{
+      color:#b080ff;text-align:center;
+      margin:6px 0;font-size:11px;letter-spacing:3px;
+      padding:2px 0;
+      border-top:1px solid rgba(176,128,255,.25);
+      border-bottom:1px solid rgba(176,128,255,.25);
+    }
+    .blog b{color:var(--gold);text-shadow:0 0 6px rgba(240,200,96,.5)}
+    .blog i{font-style:normal;color:#80d0ff}
+
+    /* 操作栏 */
+    #battleActions{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:5px;flex-shrink:0;
+    }
+    .battle-skill{
+      padding:9px 3px;
+      font-family:inherit;font-size:11.5px;font-weight:bold;
+      letter-spacing:1px;
+      color:#f0e0ff;
+      background:
+        linear-gradient(180deg,#5a30a0,#3a1a70);
+      border:2px solid #000;border-radius:3px;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:2px;
+      box-shadow:2px 2px 0 rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.15);
+      transition:all .08s;user-select:none;
+      text-shadow:1px 1px 0 #000;
+      position:relative;
+      overflow:hidden;
+    }
+    .battle-skill .bs-name{
+      font-size:11.5px;white-space:nowrap;
+      overflow:hidden;text-overflow:ellipsis;
+      max-width:100%;
+    }
+    .battle-skill .bs-mp{
+      font-size:9px;color:#c8b0e8;font-weight:normal;
+      text-shadow:1px 1px 0 #000;
+    }
+    .battle-skill small{
+      font-size:9px;color:#c8b0e8;font-weight:normal;
+      text-shadow:1px 1px 0 #000;
+    }
+    .battle-skill:active:not(.disabled){
+      transform:translate(2px,2px);
+      box-shadow:0 0 0 rgba(0,0,0,.5);
+    }
+    .battle-skill.basic{
+      background:linear-gradient(180deg,#4a4a5a,#2a2a3a);
+    }
+    .battle-skill.defend{
+      background:linear-gradient(180deg,#3a5a80,#1a3050);
+    }
+    .battle-skill.flee{
+      background:linear-gradient(180deg,#a03050,#601020);
+    }
+    .battle-skill.item{
+      background:linear-gradient(180deg,#806020,#503810);
+    }
+    .battle-skill.disabled{
+      opacity:.35;cursor:not-allowed;
+      filter:grayscale(.5);
+    }
+    .battle-skill .bs-type{
+      position:absolute;top:1px;right:2px;
+      font-size:8px;color:#ffd060;
+      text-shadow:1px 1px 0 #000;
+    }
+
+    /* 战斗回合提示 */
+    .turn-banner{
+      position:absolute;left:50%;top:45%;
+      transform:translate(-50%,-50%) scale(.8);
+      font-size:28px;font-weight:bold;
+      letter-spacing:8px;
+      color:#ffd060;
+      text-shadow:2px 2px 0 #000,0 0 24px rgba(255,208,96,.8);
+      pointer-events:none;
+      opacity:0;
+      z-index:150;
+      white-space:nowrap;
+    }
+    .turn-banner.show{
+      animation:turnBanner 1.2s ease-out;
+    }
+    @keyframes turnBanner{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}
+      30%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}
+      70%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+      100%{opacity:0;transform:translate(-50%,-50%) scale(1.05)}
+    }
+
+    /* 胜利/失败覆盖 */
+    .result-banner{
+      position:absolute;inset:0;
+      display:none;flex-direction:column;
+      align-items:center;justify-content:center;
+      gap:16px;z-index:180;
+      background:radial-gradient(circle at 50% 50%,rgba(0,0,0,.7),rgba(0,0,0,.9));
+      backdrop-filter:blur(3px);
+    }
+    .result-banner.show{display:flex}
+    .rb-title{
+      font-size:38px;font-weight:bold;
+      letter-spacing:12px;
+      text-shadow:3px 3px 0 #000;
+      animation:rbIn .5s cubic-bezier(.25,1.4,.5,1);
+    }
+    .rb-title.win{color:#ffd060;text-shadow:3px 3px 0 #000,0 0 30px rgba(255,208,96,.9)}
+    .rb-title.lose{color:#ff5060;text-shadow:3px 3px 0 #000,0 0 30px rgba(255,80,96,.9)}
+    @keyframes rbIn{
+      from{opacity:0;transform:scale(.4) rotate(-8deg)}
+      to{opacity:1;transform:scale(1) rotate(0)}
+    }
+    .rb-info{
+      font-size:13px;color:#f0e0ff;
+      text-align:center;line-height:2;
+      text-shadow:1px 1px 0 #000;
+      padding:14px 20px;
+      background:linear-gradient(180deg,rgba(60,30,110,.8),rgba(30,15,60,.8));
+      border:2px solid var(--gold-dk);
+      border-radius:8px;
+      box-shadow:inset 0 0 0 1px rgba(240,200,96,.4),0 4px 16px rgba(0,0,0,.6);
+      min-width:220px;
+    }
+    .rb-info b{color:#ffd060;font-size:15px}
+    .rb-btn{
+      padding:11px 40px;
+      font-family:inherit;font-size:14px;font-weight:bold;
+      letter-spacing:4px;
+      color:#3a1f0e;
+      background:linear-gradient(180deg,#ffe8a0,#f0c860 45%,#c89020);
+      border:2px solid #6a4810;border-radius:6px;cursor:pointer;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.7),
+        inset 0 -3px 5px rgba(120,80,20,.4),
+        0 3px 0 #5a4010,
+        0 4px 8px rgba(0,0,0,.5);
+      transition:all .07s;
+      text-shadow:0 1px 0 rgba(255,255,255,.5);
+    }
+    .rb-btn:active{
+      transform:translateY(3px);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.7),
+        inset 0 -1px 3px rgba(120,80,20,.4),
+        0 0 0 #5a4010,
+        0 1px 3px rgba(0,0,0,.5);
+    }
+
+    /* 技能选择返回按钮 */
+    .skill-back{
+      grid-column:1/-1;
+      padding:8px;
+      font-family:inherit;font-size:12px;font-weight:bold;
+      letter-spacing:2px;color:#c8b0e8;
+      background:linear-gradient(180deg,#3a2a5a,#1a1028);
+      border:2px solid #000;border-radius:3px;cursor:pointer;
+      box-shadow:2px 2px 0 rgba(0,0,0,.5);
+      text-shadow:1px 1px 0 #000;
+    }
+    .skill-back:active{transform:translate(1px,1px);box-shadow:1px 1px 0 rgba(0,0,0,.5)}
+  `;
+  document.head.appendChild(style);
+})();
+
+/* ==================== 战斗状态 ==================== */
+const battle = {
+  active: false,
+  units: [],       // 所有单位
+  round: 0,
+  over: false,
+  victory: false,
+  fled: false,
+  overlay: null,
+  scene: null,
+  loopRunning: false,
+  token: 0,
+};
+
+/* 创建战斗界面 DOM */
+function createBattleUI(){
+  if (battle.overlay) return battle.overlay;
+  
+  const overlay = document.createElement('div');
+  overlay.id = 'battleOverlay';
+  overlay.innerHTML = `
+    <div class="battle-scene">
+      <div class="battle-row enemy" id="enemyRow"></div>
+      <div id="battleLog"></div>
+      <div class="battle-row player" id="playerRow"></div>
+      <div class="turn-banner" id="turnBanner"></div>
+      <div class="result-banner" id="resultBanner"></div>
+    </div>
+    <div id="battleActions"></div>
+  `;
+  document.getElementById('stage').appendChild(overlay);
+  battle.overlay = overlay;
+  return overlay;
+}
+
+/* ==================== 战斗日志 ==================== */
+function blog(text, cls = ''){
+  const el = $('battleLog');
+  if (!el) return;
+  const d = document.createElement('div');
+  d.className = 'blog ' + cls;
+  d.innerHTML = text;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+  while (el.children.length > 80) el.removeChild(el.firstChild);
+}
+
+/* ==================== 伤害计算 ==================== */
+function calcDamage(attacker, defender, power, type){
+  // 攻击方主属性
+  const atkStat = (type === 'magic') ? (attacker.magic || attacker.atk) : attacker.atk;
+  // 防御减免系数（物理被防御更多减免）
+  const defFactor = (type === 'magic') ? 0.4 : 0.7;
+  
+  const base = atkStat * power * (0.9 + Math.random() * 0.2);
+  const reduction = defender.def * defFactor;
+  let dmg = Math.max(1, base - reduction);
+  
+  // 暴击
+  const crit = Math.random() < 0.12;
+  if (crit) dmg *= 1.6;
+  
+  // 防御姿态减伤50%
+  if (defender.guard){
+    dmg *= 0.5;
+  }
+  
+  return { dmg: Math.floor(dmg), crit };
+}
+
+/* ==================== 单位卡片渲染 ==================== */
+function battleUnitCard(u){
+  const hpPct = clamp(u.hp / u.maxHp * 100, 0, 100);
+  const cls = [
+    'battle-unit',
+    u.isPlayer ? 'is-player' : '',
+    u.isPet ? 'is-pet' : '',
+    !u.alive ? 'dead' : '',
+    u.acting ? 'acting' : '',
+  ].filter(Boolean).join(' ');
+  
+  const statusIcons = [];
+  if (u.stun && u.stun > 0) statusIcons.push(`<span>💫定身${u.stun}</span>`);
+  if (u.guard) statusIcons.push(`<span>🛡️防御</span>`);
+  
+  return `
+    <div class="${cls}" data-uid="${u.id}">
+      <div class="bu-head">
+        <div class="bu-icon">${u.icon || (u.isPlayer ? '🧝' : '👹')}</div>
+        <div class="bu-name">${u.name}${u.lv ? `<small>Lv.${u.lv}</small>` : ''}</div>
+      </div>
+      <div class="bu-hp">
+        <div class="fill" style="width:${hpPct}%"></div>
+      </div>
+      <div class="bu-hp-text">${Math.max(0, Math.ceil(u.hp))}/${u.maxHp}</div>
+      ${statusIcons.length ? `<div class="bu-status">${statusIcons.join('')}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderBattleUnits(){
+  const enemyRow = $('enemyRow');
+  const playerRow = $('playerRow');
+  if (!enemyRow || !playerRow) return;
+  
+  enemyRow.innerHTML = battle.units.filter(u => u.isEnemy).map(battleUnitCard).join('');
+  playerRow.innerHTML = battle.units.filter(u => !u.isEnemy).map(battleUnitCard).join('');
+}
+
+/* 显示飘字 */
+function showDamageFloat(uid, text, cls = ''){
+  const card = document.querySelector(`.battle-unit[data-uid="${uid}"]`);
+  if (!card) return;
+  const f = document.createElement('div');
+  f.className = 'dmg-float ' + cls;
+  f.textContent = text;
+  card.style.position = 'relative';
+  card.appendChild(f);
+  setTimeout(() => f.remove(), 1100);
+}
+
+/* 单位受击抖动 */
+function shakeUnit(uid){
+  const card = document.querySelector(`.battle-unit[data-uid="${uid}"]`);
+  if (!card) return;
+  card.classList.remove('damaged');
+  void card.offsetWidth;
+  card.classList.add('damaged');
+  setTimeout(() => card.classList.remove('damaged'), 350);
+}
+
+/* ==================== 战斗准备 ==================== */
+function battlePrepare(mobs){
+  const overlay = createBattleUI();
+  battle.active = true;
+  battle.over = false;
+  battle.victory = false;
+  battle.fled = false;
+  battle.round = 0;
+  battle.loopRunning = false;
+  battle.token++;
+  const battleToken = battle.token;
+  
+  // 收集场景信息
+  battle.scene = getSceneAt(P.x, P.y);
+  
+  // 组装单位
+  const units = [];
+  
+  // 玩家
+  units.push({
+    id: 'player',
+    name: P.name,
+    icon: '🧝',
+    isPlayer: true,
+    hp: P.hp, maxHp: P.maxHp,
+    mp: P.mp, maxMp: P.maxMp,
+    atk: P.atk, def: P.def, spd: P.spd, magic: P.magic,
+    alive: true, stun: 0, guard: false, acting: false,
+  });
+  
+  // 召唤兽
+  if (P.pet){
+    units.push({
+      id: 'pet',
+      name: P.pet.name,
+      icon: P.pet.icon,
+      isPet: true,
+      hp: P.pet.hp, maxHp: P.pet.maxHp,
+      mp: 0, maxMp: 0,
+      atk: P.pet.atk, def: P.pet.def, spd: P.pet.spd,
+      alive: true, stun: 0, guard: false, acting: false,
+    });
+  }
+  
+  // 怪物
+  mobs.forEach((m, i) => {
+    units.push({
+      id: 'e' + i,
+      name: m.name,
+      icon: m.icon,
+      isEnemy: true,
+      lv: m.lv,
+      hp: m.hp, maxHp: m.maxHp,
+      mp: 0, maxMp: 0,
+      atk: m.atk, def: m.def, spd: m.spd, magic: m.atk,
+      skills: m.skills || [],
+      exp: m.exp || 30, gold: m.gold || 15,
+      alive: true, stun: 0, guard: false, acting: false,
+    });
+  });
+  
+  battle.units = units;
+  
+  // 显示战斗界面
+  overlay.classList.remove('fading');
+  overlay.classList.add('show');
+  $('battleLog').innerHTML = '';
+  $('battleActions').innerHTML = '';
+  $('resultBanner').classList.remove('show');
+  
+  renderBattleUnits();
+  
+  // 战斗开场提示
+  const mobNames = mobs.map(m => `${m.icon}${m.name}`).join(' ');
+  blog(`⚔️ 遭遇 <b>${mobNames}</b>！`, 'warn');
+  
+  // 短暂延迟后开始
+  setTimeout(() => {
+    if (battle.active && battle.token === battleToken && !battle.loopRunning){
+      battleLoop(battleToken);
+    }
+  }, 500);
+}
+
+/* ==================== 战斗主循环 ==================== */
+async function battleLoop(token = battle.token){
+  if (battle.loopRunning) return;
+  battle.loopRunning = true;
+  try {
+    while (battle.active && token === battle.token && !battle.over && battle.round < 30){
+    battle.round++;
+    
+    // 回合提示
+    showTurnBanner(`第 ${battle.round} 回合`);
+    blog(`—— 第 ${battle.round} 回合 ——`, 'round');
+    await sleep(700);
+    
+    // 清除回合开始状态
+    battle.units.forEach(u => u.guard = false);
+    
+    // 按速度排序
+    const order = battle.units
+      .filter(u => u.alive)
+      .sort((a, b) => (b.spd - a.spd) + (Math.random() - 0.5) * 3);
+    
+    for (const u of order){
+      if (!u.alive || battle.over) continue;
+      
+      // 定身检查
+      if (u.stun > 0){
+        u.stun--;
+        u.acting = true;
+        renderBattleUnits();
+        blog(`💫 <b>${u.name}</b> 被定身，无法行动。`, 'dim');
+        await sleep(450);
+        u.acting = false;
+        renderBattleUnits();
+        continue;
+      }
+      
+      u.acting = true;
+      renderBattleUnits();
+      await sleep(200);
+      
+      if (u.isPlayer){
+        await playerTurn(u);
+      } else if (u.isPet){
+        await petTurn(u);
+      } else {
+        await monsterTurn(u);
+      }
+      
+      u.acting = false;
+      renderBattleUnits();
+      checkBattleEnd();
+      
+      if (battle.over) break;
+      await sleep(300);
+    }
+  }
+  
+    // 战斗结束后必须进入结算界面
+    if (token !== battle.token) return;
+    if (battle.over){
+      if (battle.fled) finishBattle('flee');
+      else if (battle.victory) finishBattle('victory');
+      else finishBattle('defeat');
+    } else if (battle.active){
+      // 超过30回合，平局
+      blog('⏳ 战斗超时，双方各自收手。', 'dim');
+      battle.over = true;
+      finishBattle('draw');
+    }
+  } finally {
+    if (token === battle.token) battle.loopRunning = false;
+  }
+}
+
+/* ==================== 玩家回合 ==================== */
+function playerTurn(unit){
+  return new Promise(resolve => {
+    if (!battle.active || battle.over || !unit || !unit.alive){
+      resolve();
+      return;
+    }
+    const actions = $('battleActions');
+    actions.innerHTML = '';
+    
+    // 主菜单：攻击 / 技能 / 防御 / 逃跑 / 物品
+    const mainMenu = [
+      { key:'attack',  name:'普通攻击', icon:'⚔️', cls:'basic' },
+      { key:'skill',   name:'施放技能', icon:'✨', cls:'' },
+      { key:'item',    name:'使用物品', icon:'🧪', cls:'item' },
+      { key:'defend',  name:'防御',     icon:'🛡️', cls:'defend' },
+      { key:'flee',    name:'逃跑',     icon:'💨', cls:'flee' },
+      { key:'auto',    name:'自动战斗', icon:'🤖', cls:'basic' },
+    ];
+    
+    mainMenu.forEach(m => {
+      const btn = document.createElement('button');
+      btn.className = 'battle-skill ' + m.cls;
+      btn.innerHTML = `<span class="bs-name">${m.icon} ${m.name}</span>`;
+      btn.addEventListener('click', () => {
+        actions.innerHTML = '';
+        handlePlayerAction(unit, m.key, resolve);
+      });
+      actions.appendChild(btn);
+    });
+  });
+}
+
+function handlePlayerAction(unit, action, resolve){
+  const actions = $('battleActions');
+  
+  if (action === 'attack'){
+    // 选择目标（多个时）
+    const enemies = battle.units.filter(u => u.alive && u.isEnemy);
+    if (enemies.length === 1){
+      performAttack(unit, enemies[0], 1.0, 'phys', resolve);
+    } else {
+      showTargetSelect(enemies, (target) => {
+        performAttack(unit, target, 1.0, 'phys', resolve);
+      });
+    }
+  } else if (action === 'skill'){
+    showSkillMenu(unit, resolve);
+  } else if (action === 'item'){
+    showItemMenu(unit, resolve);
+  } else if (action === 'defend'){
+    // 防御必须明确结束当前玩家回合；使用微任务交接，避免首次战斗时
+    // 同步 resolve 与 battleLoop 的渲染/输入状态发生竞争而卡住。
+    unit.guard = true;
+    blog(`🛡️ <b>${unit.name}</b> 凝神戒备，进入防御姿态。`, 'good');
+    renderBattleUnits();
+    setTimeout(() => {
+      if (battle.active && !battle.over) resolve();
+      else resolve();
+    }, 0);
+  } else if (action === 'flee'){
+    if (Math.random() < 0.6){
+      battle.over = true;
+      battle.fled = true;
+      blog('💨 你施展身法，成功脱离了战斗！', 'warn');
+    } else {
+      blog('❌ 逃跑失败！', 'bad');
+    }
+    resolve();
+  } else if (action === 'auto'){
+    // 自动战斗：选最低血敌人普攻
+    const enemies = battle.units.filter(u => u.alive && u.isEnemy);
+    if (!enemies.length) { resolve(); return; }
+    const target = enemies.reduce((a, b) => a.hp < b.hp ? a : b);
+    performAttack(unit, target, 1.0, 'phys', resolve);
+  }
+}
+
+function showTargetSelect(enemies, onSelect){
+  const actions = $('battleActions');
+  actions.innerHTML = '';
+  
+  const back = document.createElement('button');
+  back.className = 'skill-back';
+  back.textContent = '← 返回';
+  back.addEventListener('click', () => {
+    actions.innerHTML = '';
+    // 重新进入玩家回合
+    if (typeof playerTurn === 'function'){
+      playerTurn(battle.units.find(u => u.isPlayer)).then(() => {});
+    }
+  });
+  actions.appendChild(back);
+  
+  enemies.forEach(e => {
+    const btn = document.createElement('button');
+    btn.className = 'battle-skill basic';
+    btn.innerHTML = `
+      <span class="bs-name">${e.icon}${e.name}</span>
+      <span class="bs-mp">HP ${Math.ceil(e.hp)}/${e.maxHp}</span>
+    `;
+    btn.addEventListener('click', () => {
+      actions.innerHTML = '';
+      onSelect(e);
+    });
+    actions.appendChild(btn);
+  });
+}
+
+function showSkillMenu(unit, resolve){
+  const actions = $('battleActions');
+  actions.innerHTML = '';
+  
+  const skills = getSectSkills();
+  
+  if (!skills.length){
+    blog('你尚未习得任何技能。', 'dim');
+    // 重新进入玩家回合
+    playerTurn(unit).then(resolve);
+    return;
+  }
+  
+  skills.forEach(sk => {
+    const canUse = unit.mp >= sk.mp;
+    const btn = document.createElement('button');
+    btn.className = 'battle-skill' + (canUse ? '' : ' disabled');
+    btn.innerHTML = `
+      <span class="bs-type">${sk.type === 'magic' ? '法' : sk.type === 'phys' ? '武' : sk.type === 'heal' ? '疗' : '封'}</span>
+      <span class="bs-name">${sk.name}</span>
+      <span class="bs-mp">${sk.mp} 法力</span>
+    `;
+    if (canUse){
+      btn.addEventListener('click', () => {
+        actions.innerHTML = '';
+        // 群体技能直接释放
+        if (sk.target === 'all' || sk.type === 'heal'){
+          unit.mp -= sk.mp;
+          applySkill(unit, sk);
+          resolve();
+        } else {
+          // 单体技能选目标
+          const enemies = battle.units.filter(u => u.alive && u.isEnemy);
+          if (enemies.length === 1){
+            unit.mp -= sk.mp;
+            applySkill(unit, sk, enemies[0]);
+            resolve();
+          } else {
+            showTargetSelect(enemies, (t) => {
+              unit.mp -= sk.mp;
+              applySkill(unit, sk, t);
+              resolve();
+            });
+          }
+        }
+      });
+    }
+    actions.appendChild(btn);
+  });
+  
+  const back = document.createElement('button');
+  back.className = 'skill-back';
+  back.textContent = '← 返回';
+  back.addEventListener('click', () => {
+    actions.innerHTML = '';
+    playerTurn(unit).then(resolve);
+  });
+  actions.appendChild(back);
+}
+
+function showItemMenu(unit, resolve){
+  const actions = $('battleActions');
+  actions.innerHTML = '';
+  
+  const bagItems = Object.keys(P.bag).filter(k => P.bag[k] > 0 && ITEMS[k] && ITEMS[k].type === 'potion');
+  
+  if (!bagItems.length){
+    blog('你没有可用的药品。', 'dim');
+    playerTurn(unit).then(resolve);
+    return;
+  }
+  
+  bagItems.forEach(id => {
+    const it = ITEMS[id];
+    const btn = document.createElement('button');
+    btn.className = 'battle-skill item';
+    btn.innerHTML = `
+      <span class="bs-name">${it.icon}${it.name}</span>
+      <span class="bs-mp">×${P.bag[id]}</span>
+    `;
+    btn.addEventListener('click', () => {
+      actions.innerHTML = '';
+      // 使用物品
+      const result = it.use();
+      P.bag[id]--;
+      if (P.bag[id] <= 0) delete P.bag[id];
+      blog(`🧪 <b>${unit.name}</b> 使用了 ${it.icon}${it.name}，${result}`, 'good');
+      // 同步战斗单位数据
+      unit.hp = P.hp;
+      unit.mp = P.mp;
+      renderBattleUnits();
+      resolve();
+    });
+    actions.appendChild(btn);
+  });
+  
+  const back = document.createElement('button');
+  back.className = 'skill-back';
+  back.textContent = '← 返回';
+  back.addEventListener('click', () => {
+    actions.innerHTML = '';
+    playerTurn(unit).then(resolve);
+  });
+  actions.appendChild(back);
+}
+
+/* ==================== 执行攻击 ==================== */
+function performAttack(caster, target, power, type, resolve){
+  const { dmg, crit } = calcDamage(caster, target, power, type);
+  target.hp = Math.max(0, target.hp - dmg);
+  
+  if (target.hp <= 0){
+    target.alive = false;
+  }
+  
+  // 动画
+  shakeUnit(target.id);
+  showDamageFloat(target.id, `-${dmg}`, crit ? 'crit' : '');
+  
+  const isAlly = caster.isPlayer || caster.isPet;
+  const cls = isAlly ? 'good' : 'bad';
+  blog(
+    `${crit ? '💥' : '⚔️'} <b>${caster.name}</b> 攻击 <b>${target.name}</b>，造成 <b>${dmg}</b> 点伤害${crit ? '（暴击！）' : ''}`,
+    cls
+  );
+  
+  if (!target.alive){
+    blog(`☠️ <b>${target.name}</b> 倒下了！`, 'warn');
+  }
+  
+  renderBattleUnits();
+  setTimeout(resolve, 350);
+}
+
+/* ==================== 应用技能 ==================== */
+function applySkill(caster, skill, target){
+  // 治疗技能
+  if (skill.type === 'heal'){
+    const power = skill.power;
+    const stat = caster.magic || caster.atk;
+    const amount = Math.floor(stat * power * 1.5);
+    const before = caster.hp;
+    caster.hp = Math.min(caster.maxHp, caster.hp + amount);
+    const actual = caster.hp - before;
+    
+    // 同步玩家血量
+    if (caster.isPlayer){ P.hp = caster.hp; P.mp = caster.mp; }
+    
+    showDamageFloat(caster.id, `+${actual}`, 'heal');
+    blog(`✨ <b>${caster.name}</b> 施展【${skill.name}】，恢复 <b>${actual}</b> 点气血！`, 'good');
+    renderBattleUnits();
+    return;
+  }
+  
+  // 封印/定身
+  if (skill.type === 'debuff'){
+    if (!target) return;
+    target.stun = (target.stun || 0) + 2;
+    blog(`🔒 <b>${caster.name}</b> 施展【${skill.name}】，<b>${target.name}</b> 被定身 2 回合！`, 'warn');
+    renderBattleUnits();
+    return;
+  }
+  
+  // 攻击技能
+  let targets;
+  if (skill.target === 'all'){
+    targets = battle.units.filter(u => u.alive && (caster.isEnemy ? !u.isEnemy : u.isEnemy));
+  } else {
+    targets = [target];
+  }
+  
+  targets.forEach(t => {
+    if (!t || !t.alive) return;
+    const { dmg, crit } = calcDamage(caster, t, skill.power, skill.type);
+    t.hp = Math.max(0, t.hp - dmg);
+    if (t.hp <= 0) t.alive = false;
+    
+    shakeUnit(t.id);
+    showDamageFloat(t.id, `-${dmg}`, crit ? 'crit' : '');
+    
+    const isAlly = caster.isPlayer || caster.isPet;
+    blog(
+      `${crit ? '💥' : '✨'} <b>${caster.name}</b> 施展【${skill.name}】，对 <b>${t.name}</b> 造成 <b>${dmg}</b> 点伤害${crit ? '（暴击！）' : ''}`,
+      isAlly ? 'good' : 'bad'
+    );
+    
+    if (!t.alive){
+      blog(`☠️ <b>${t.name}</b> 倒下了！`, 'warn');
+    }
+  });
+  
+  // 普度众生：攻击同时回血
+  if (skill.id === 'pu'){
+    const healAmt = Math.floor((caster.magic || caster.atk) * 0.8);
+    caster.hp = Math.min(caster.maxHp, caster.hp + healAmt);
+    if (caster.isPlayer){ P.hp = caster.hp; }
+    showDamageFloat(caster.id, `+${healAmt}`, 'heal');
+    blog(`💚 <b>${caster.name}</b> 同时恢复了 <b>${healAmt}</b> 点气血。`, 'good');
+  }
+  
+  // 破釜沉舟：自损
+  if (skill.id === 'po'){
+    const selfDmg = Math.floor(caster.hp * 0.1);
+    caster.hp = Math.max(1, caster.hp - selfDmg);
+    if (caster.isPlayer){ P.hp = caster.hp; }
+    showDamageFloat(caster.id, `-${selfDmg}`, '');
+    blog(`💔 <b>${caster.name}</b> 燃烧气血，自损 <b>${selfDmg}</b> 点。`, 'dim');
+  }
+  
+  renderBattleUnits();
+}
+
+/* ==================== 召唤兽回合 ==================== */
+async function petTurn(unit){
+  const enemies = battle.units.filter(u => u.alive && u.isEnemy);
+  if (!enemies.length) return;
+  const target = enemies.reduce((a, b) => a.hp < b.hp ? a : b);
+  
+  blog(`🐾 <b>${unit.name}</b> 扑向 <b>${target.name}</b>！`);
+  await sleep(250);
+  
+  const { dmg, crit } = calcDamage(unit, target, 1.0, 'phys');
+  target.hp = Math.max(0, target.hp - dmg);
+  if (target.hp <= 0) target.alive = false;
+  
+  shakeUnit(target.id);
+  showDamageFloat(target.id, `-${dmg}`, crit ? 'crit' : '');
+  
+  blog(
+    `${crit ? '💥' : '🐾'} 造成 <b>${dmg}</b> 点伤害${crit ? '（暴击！）' : ''}`,
+    'good'
+  );
+  
+  if (!target.alive){
+    blog(`☠️ <b>${target.name}</b> 倒下了！`, 'warn');
+  }
+  
+  renderBattleUnits();
+  await sleep(300);
+}
+
+/* ==================== 怪物回合 ==================== */
+async function monsterTurn(unit){
+  const allies = battle.units.filter(u => u.alive && !u.isEnemy);
+  if (!allies.length) return;
+  
+  // 优先攻击血量低的
+  const target = allies.reduce((a, b) => a.hp < b.hp ? a : b);
+  
+  // 怪物偶尔使用技能
+  if (unit.skills && unit.skills.length && Math.random() < 0.3){
+    const sk = unit.skills[Math.floor(Math.random() * unit.skills.length)];
+    const { dmg } = calcDamage(unit, target, sk.power || 1.3, sk.type || 'magic');
+    target.hp = Math.max(0, target.hp - dmg);
+    if (target.hp <= 0) target.alive = false;
+    
+    shakeUnit(target.id);
+    showDamageFloat(target.id, `-${dmg}`, '');
+    blog(`😈 <b>${unit.name}</b> 施展【${sk.name}】，对 <b>${target.name}</b> 造成 <b>${dmg}</b> 点伤害`, 'bad');
+  } else {
+    const { dmg, crit } = calcDamage(unit, target, 1.0, 'phys');
+    target.hp = Math.max(0, target.hp - dmg);
+    if (target.hp <= 0) target.alive = false;
+    
+    shakeUnit(target.id);
+    showDamageFloat(target.id, `-${dmg}`, crit ? 'crit' : '');
+    blog(`👹 <b>${unit.name}</b> 攻击 <b>${target.name}</b>，造成 <b>${dmg}</b> 点伤害${crit ? '（暴击！）' : ''}`, 'bad');
+  }
+  
+  if (!target.alive){
+    blog(`☠️ <b>${target.name}</b> 倒下了！`, 'bad');
+  }
+  
+  renderBattleUnits();
+  await sleep(350);
+}
+
+/* ==================== 检查战斗结束 ==================== */
+function checkBattleEnd(){
+  const enemies = battle.units.filter(u => u.alive && u.isEnemy);
+  const allies = battle.units.filter(u => u.alive && !u.isEnemy);
+  
+  if (enemies.length === 0){
+    battle.over = true;
+    battle.victory = true;
+  } else if (allies.length === 0){
+    battle.over = true;
+    battle.victory = false;
+  }
+}
+
+/* ==================== 战斗回合提示 ==================== */
+function showTurnBanner(text){
+  const el = $('turnBanner');
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+/* ==================== 战斗结算 ==================== */
+function finishBattle(result){
+  // 先解除战斗状态，确保结算界面出现后地图不会被旧状态锁死。
+  battle.active = false;
+  battle.over = true;
+  
+  const playerUnit = battle.units.find(u => u.isPlayer);
+  const petUnit = battle.units.find(u => u.isPet);
+  
+  // 同步玩家状态
+  if (playerUnit){
+    P.hp = Math.max(1, playerUnit.hp);
+    P.mp = playerUnit.mp;
+  }
+  if (petUnit && P.pet){
+    P.pet.hp = Math.max(1, petUnit.hp);
+  }
+  
+  const banner = $('resultBanner');
+  banner.innerHTML = '';
+  
+  if (result === 'flee' || battle.fled){
+    banner.innerHTML = `
+      <div class="rb-title win" style="color:#80d0ff;text-shadow:3px 3px 0 #000,0 0 30px rgba(128,208,255,.9)">脱 离</div>
+      <div class="rb-info">你成功脱离了战斗</div>
+      <button class="rb-btn" id="rbOk">继 续</button>
+    `;
+  } else if (result === 'draw'){
+    banner.innerHTML = `
+      <div class="rb-title" style="color:#c0a0e8">平 局</div>
+      <div class="rb-info">战斗超时，双方各自收手</div>
+      <button class="rb-btn" id="rbOk">继 续</button>
+    `;
+  } else if (battle.victory){
+    // 计算奖励
+    let exp = 0, gold = 0;
+    battle.units.filter(u => u.isEnemy).forEach(m => {
+      exp += m.exp || 30;
+      gold += m.gold || 15;
+    });
+    
+    // 加成
+    const bonus = 1 + P.lv * 0.05;
+    exp = Math.floor(exp * bonus);
+    gold = Math.floor(gold * bonus);
+    
+    P.gold += gold;
+    P.battles++;
+    gainExp(exp);
+    
+    banner.innerHTML = `
+      <div class="rb-title win">胜 利</div>
+      <div class="rb-info">
+        获得经验 <b>+${fmt(exp)}</b><br>
+        获得银两 <b>+${fmt(gold)}</b>
+      </div>
+      <button class="rb-btn" id="rbOk">继 续</button>
+    `;
+    
+    addLog(`【战斗】胜利！经验 +${exp}，银两 +${gold}`, 'good');
+  } else {
+    const lost = Math.floor(P.gold * 0.1);
+    P.gold = Math.max(0, P.gold - lost);
+    P.hp = Math.max(1, Math.floor(P.maxHp * 0.25));
+    P.mp = Math.max(0, Math.floor(P.maxMp * 0.3));
+    
+    banner.innerHTML = `
+      <div class="rb-title lose">战 败</div>
+      <div class="rb-info">
+        你被击倒在地……<br>
+        损失银两 <b>${fmt(lost)}</b> 两
+      </div>
+      <button class="rb-btn" id="rbOk">继 续</button>
+    `;
+    
+    addLog(`【战斗】战败，损失 ${lost} 两`, 'bad');
+  }
+  
+  banner.classList.add('show');
+  
+  // 绑定继续按钮
+  setTimeout(() => {
+    const okBtn = $('rbOk');
+    if (okBtn){
+      okBtn.addEventListener('click', () => {
+        closeBattleUI();
+      });
+    }
+  }, 50);
+  
+  updateHUD();
+}
+
+function closeBattleUI(){
+  // 彻底清理战斗锁与当前回合状态。
+  battle.token++;
+  battle.loopRunning = false;
+  battle.active = false;
+  battle.over = true;
+  battle.victory = false;
+  battle.fled = false;
+  const overlay = battle.overlay;
+  if (overlay){
+    overlay.classList.add('fading');
+    setTimeout(() => {
+      overlay.classList.remove('show');
+      overlay.classList.remove('fading');
+      $('resultBanner').classList.remove('show');
+    }, 300);
+  }
+  battle.units = [];
+  battle.round = 0;
+  renderWorld();
+}
+
+/* ============================================================
+   坊市商店系统
+   ============================================================ */
+let shopTab = 'buy';
+let shopSelectedItem = null;
+
+function openShopPanel(){
+  // 检查是否在长安城范围内
+  if (!isTown(P.x, P.y)){
+    toast('坊市只在长安城内开放');
+    return;
+  }
+  
+  // 动态创建商店弹窗
+  let modal = $('modalShop');
+  if (!modal){
+    modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'modalShop';
+    modal.innerHTML = `
+      <div class="dialog">
+        <div class="dialog-head">
+          <div class="dialog-title">坊 市</div>
+          <button class="dialog-close" data-close="modalShop">✕</button>
+        </div>
+        <div class="dialog-body" id="shopBody"></div>
+        <div class="dialog-foot">
+          <button class="btn primary" data-close="modalShop">离 开</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('game').appendChild(modal);
+    
+    // 绑定关闭
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.classList.remove('show');
+    });
+    modal.querySelectorAll('[data-close]').forEach(btn => {
+      btn.addEventListener('click', () => modal.classList.remove('show'));
+    });
+  }
+  
+  renderShopPanel();
+  modal.classList.add('show');
+}
+
+function renderShopPanel(){
+  const body = $('shopBody');
+  if (!body) return;
+  
+  body.innerHTML = `
+    <div style="display:flex;gap:4px;margin-bottom:12px">
+      <button class="btn small ${shopTab==='buy'?'primary':''}" data-stab="buy" style="flex:1">购 买</button>
+      <button class="btn small ${shopTab==='sell'?'primary':''}" data-stab="sell" style="flex:1">出 售</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:6px 10px;background:linear-gradient(180deg,rgba(240,200,96,.12),transparent);border:1.5px solid rgba(240,200,96,.3);border-radius:6px">
+      <span style="font-size:11px;color:#c0a870">💰 你的银两</span>
+      <span style="font-size:13px;color:#ffd060;font-weight:bold;text-shadow:0 1px 0 #000">${fmt(P.gold)} 两</span>
+    </div>
+    <div id="shopItems"></div>
+  `;
+  
+  body.querySelectorAll('[data-stab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      shopTab = btn.dataset.stab;
+      renderShopPanel();
+    });
+  });
+  
+  const list = body.querySelector('#shopItems');
+  
+  if (shopTab === 'buy'){
+    renderBuyList(list);
+  } else {
+    renderSellList(list);
+  }
+}
+
+function renderBuyList(list){
+  // 商店出售的药品
+  const buyables = ['hp1', 'hp2', 'hp3', 'mp1', 'mp2', 'exp1', 'exp2', 'stone1', 'stone2', 'stone3'];
+  
+  buyables.forEach(id => {
+    const it = ITEMS[id];
+    if (!it) return;
+    const rare = it.rare || 0;
+    const itEl = document.createElement('div');
+    itEl.className = 'list-item' + (rare>=1?` rare-${rare}`:'');
+    itEl.innerHTML = `
+      <div class="li-icon" style="font-size:22px">${it.icon}</div>
+      <div class="li-body">
+        <div class="li-name">${it.name}</div>
+        <div class="li-desc">${it.desc}</div>
+      </div>
+      <div class="li-right" style="color:#ffd060">${fmt(it.price)}<small>两</small></div>
+    `;
+    const btn = document.createElement('button');
+    btn.className = 'li-btn';
+    btn.textContent = '购买';
+    btn.disabled = P.gold < it.price;
+    btn.addEventListener('click', () => {
+      if (P.gold < it.price) return;
+      // 检查背包空间
+      const keys = Object.keys(P.bag).filter(k => P.bag[k] > 0);
+      if (keys.length >= 20 && !P.bag[id]){
+        toast('背包已满');
+        return;
+      }
+      P.gold -= it.price;
+      P.bag[id] = (P.bag[id] || 0) + 1;
+      toast(`🛒 购入 ${it.icon}${it.name}`);
+      addLog(`【购买】${it.name} 花费 ${it.price} 两`, 'good');
+      updateHUD();
+      renderShopPanel();
+    });
+    itEl.appendChild(btn);
+    list.appendChild(itEl);
+  });
+}
+
+function renderSellList(list){
+  const keys = Object.keys(P.bag).filter(k => P.bag[k] > 0);
+  
+  if (!keys.length){
+    list.innerHTML = '<div class="empty-tip"><span class="ei">🎒</span>背包中没有可出售的物品</div>';
+    return;
+  }
+  
+  keys.forEach(id => {
+    const it = ITEMS[id];
+    if (!it) return;
+    // 出售价为原价 50%
+    const sellPrice = Math.floor((it.price || 0) * 0.5);
+    const rare = it.rare || 0;
+    
+    const itEl = document.createElement('div');
+    itEl.className = 'list-item' + (rare>=1?` rare-${rare}`:'');
+    itEl.innerHTML = `
+      <div class="li-icon" style="font-size:22px">${it.icon}</div>
+      <div class="li-body">
+        <div class="li-name">${it.name}<span class="li-count">×${P.bag[id]}</span></div>
+        <div class="li-desc">${it.desc}</div>
+      </div>
+      <div class="li-right" style="color:#80ffa0">+${fmt(sellPrice)}<small>两</small></div>
+    `;
+    const btn = document.createElement('button');
+    btn.className = 'li-btn';
+    btn.textContent = '出售';
+    btn.disabled = sellPrice <= 0;
+    btn.addEventListener('click', () => {
+      if (sellPrice <= 0) return;
+      P.gold += sellPrice;
+      P.bag[id]--;
+      if (P.bag[id] <= 0) delete P.bag[id];
+      toast(`💰 出售 ${it.icon}${it.name}，获得 ${sellPrice} 两`);
+      addLog(`【出售】${it.name} 获得 ${sellPrice} 两`, 'good');
+      updateHUD();
+      renderShopPanel();
+    });
+    itEl.appendChild(btn);
+    list.appendChild(itEl);
+  });
+}
+
+/* ============================================================
+   第 8 批：初始化 / 游戏主循环 / 存档系统
+   ============================================================ */
+
+const SAVE_KEY = 'mhxy_single_player_save_v1';
+let gameLoopTimer = null;
+
+/* 保存游戏 */
+function saveGame(){
+  try{
+    const data = {
+      name:P.name, sect:P.sect, lv:P.lv, exp:P.exp,
+      hp:P.hp, maxHp:P.maxHp, mp:P.mp, maxMp:P.maxMp,
+      atk:P.atk, def:P.def, spd:P.spd, magic:P.magic,
+      gold:P.gold, x:P.x, y:P.y, scene:P.scene, subScene:P.subScene,
+      bag:P.bag, pet:P.pet, petBox:P.petBox, steps:P.steps,
+      logs:Array.isArray(P.logs) ? P.logs.slice(-50) : []
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    return true;
+  }catch(err){
+    console.warn('保存游戏失败：', err);
+    return false;
+  }
+}
+
+/* 读取存档 */
+function loadGame(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data || typeof data !== 'object') return false;
+
+    const allowed = [
+      'name','sect','lv','exp','hp','maxHp','mp','maxMp',
+      'atk','def','spd','magic','gold','x','y','scene','subScene',
+      'bag','pet','petBox','steps','logs'
+    ];
+    allowed.forEach(key => {
+      if (Object.prototype.hasOwnProperty.call(data, key)) P[key] = data[key];
+    });
+
+    /* 防止旧存档或手工修改造成非法数值 */
+    P.lv = Math.max(1, Number(P.lv) || 1);
+    P.exp = Math.max(0, Number(P.exp) || 0);
+    P.maxHp = Math.max(1, Number(P.maxHp) || 100);
+    P.maxMp = Math.max(1, Number(P.maxMp) || 50);
+    P.hp = clamp(Number(P.hp) || P.maxHp, 0, P.maxHp);
+    P.mp = clamp(Number(P.mp) || P.maxMp, 0, P.maxMp);
+    P.gold = Math.max(0, Number(P.gold) || 0);
+    P.x = Number.isFinite(Number(P.x)) ? Number(P.x) : 0;
+    P.y = Number.isFinite(Number(P.y)) ? Number(P.y) : 0;
+    P.steps = Math.max(0, Number(P.steps) || 0);
+    if (!P.bag || typeof P.bag !== 'object') P.bag = {};
+    if (!Array.isArray(P.petBox)) P.petBox = [];
+    if (!Array.isArray(P.logs)) P.logs = [];
+
+    return Boolean(P.sect);
+  }catch(err){
+    console.warn('读取存档失败：', err);
+    return false;
+  }
+}
+
+/* 清除存档 */
+function clearSave(){
+  try{
+    localStorage.removeItem(SAVE_KEY);
+    return true;
+  }catch(err){
+    console.warn('清除存档失败：', err);
+    return false;
+  }
+}
+
+/* 游戏主循环：负责定时刷新 HUD，并自动保存 */
+function startGameLoop(){
+  if (gameLoopTimer) clearInterval(gameLoopTimer);
+
+  updateHUD();
+  renderWorld();
+
+  gameLoopTimer = setInterval(() => {
+    if (battle && battle.active) return;
+
+    /* 非战斗状态下缓慢恢复，避免数值溢出 */
+    if (P.hp < P.maxHp) P.hp = Math.min(P.maxHp, P.hp + 1);
+    if (P.mp < P.maxMp) P.mp = Math.min(P.maxMp, P.mp + 1);
+
+    updateHUD();
+    saveGame();
+  }, 5000);
+
+  saveGame();
+}
+
+/* 窗口大小变化后重新绘制视野 */
+window.addEventListener('resize', () => {
+  if (P.sect) renderWorld();
+});
+
+/* 页面隐藏/关闭时保存 */
+window.addEventListener('pagehide', saveGame);
+window.addEventListener('beforeunload', saveGame);
+
+/* 游戏初始化 */
+function initGame(){
+  const hasSave = loadGame();
+
+  updateHUD();
+
+  if (hasSave && P.sect && SECTS.some(s => s.id === P.sect)){
+    $('modalSect').classList.remove('show');
+    renderWorld();
+    startGameLoop();
+    toast('💾 已读取上次游戏进度');
+    return;
+  }
+
+  /* 没有有效存档时进入门派选择 */
+  P.sect = null;
+  renderSectSelect();
+  $('modalSect').classList.add('show');
+}
+
+/* DOM 已经在脚本前生成，因此这里可以直接初始化 */
+initGame();
+
+
+
+/* 响应式重绘：设备旋转、浏览器地址栏收起/展开、窗口尺寸变化时重新计算地图 */
+(function responsiveLayout(){
+  let raf = 0;
+  function refreshLayout(){
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      document.documentElement.style.setProperty('--vw', `${window.innerWidth}px`);
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`);
+      if (typeof P !== 'undefined' && P.sect && typeof renderWorld === 'function') {
+        renderWorld();
+      }
+    });
+  }
+  window.addEventListener('resize', refreshLayout, {passive:true});
+  window.addEventListener('orientationchange', () => setTimeout(refreshLayout, 120), {passive:true});
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', refreshLayout, {passive:true});
+  }
+  refreshLayout();
+})();
+
+</script>
+</div>
+</body>
+</html>
