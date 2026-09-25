@@ -5176,7 +5176,7 @@ document.addEventListener('gestureend', function(e){
       e.stopPropagation();
       const clone = JSON.parse(JSON.stringify(mob));
       clone.maxHp = clone.hp;
-      startEncounter(getSceneAt(wx, wy));
+      battlePrepare([clone]);
     });
   }
 
@@ -5231,11 +5231,14 @@ document.addEventListener('gestureend', function(e){
       out.className = 'li-btn';
       out.textContent = '出仓';
       out.onclick = () => {
+        const storedPet = P.petBox[index];
+        if (!storedPet) return;
         if (P.pet) {
-          if (P.petBox.length >= 6) return;
           P.petBox[index] = P.pet;
+        } else {
+          P.petBox.splice(index, 1);
         }
-        P.pet = P.petBox.splice(index,1)[0];
+        P.pet = storedPet;
         saveGame();
         toast(`🐾 ${P.pet.name} 已出战`);
         renderPetPanel();
@@ -5249,6 +5252,7 @@ document.addEventListener('gestureend', function(e){
 
   /* ---------- 初始化新字段，兼容旧存档 ---------- */
   P.kills = Math.max(0, Number(P.kills) || 0);
+  if (!P.kills && P.battles) P.kills = P.battles;
   P.bankGold = Math.max(0, Number(P.bankGold) || 0);
   if (!P.killStats || typeof P.killStats !== 'object') P.killStats = {};
   if (!Array.isArray(P.petBox)) P.petBox = [];
