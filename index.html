@@ -1624,6 +1624,8 @@ button{
       </div>
       <div class="dialog-body" id="charBody"></div>
       <div class="dialog-foot">
+        <button class="btn" id="btnExportSave">下载存档</button>
+        <button class="btn" id="btnImportSave">上传存档</button>
         <button class="btn primary" data-close="modalChar">关 闭</button>
       </div>
     </div>
@@ -1697,6 +1699,7 @@ button{
       </div>
     </div>
   </div>
+  <input id="saveFileInput" type="file" accept=".json,application/json" hidden>
 
 <script>
 /* ============================================================
@@ -2120,6 +2123,72 @@ document.addEventListener('click', e => {
     closeModal(closeTarget.dataset.close);
   }
 });
+
+/* 存档导入导出 */
+function exportSave(){
+  if (!saveGame()){
+    toast('存档失败，无法下载');
+    return;
+  }
+
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) throw new Error('没有可导出的存档');
+
+    const blob = new Blob([raw], {type:'application/json;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    link.href = url;
+    link.download = `梦幻西游存档-${stamp}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    toast('💾 存档已下载');
+  }catch(err){
+    console.warn('下载存档失败：', err);
+    toast('下载存档失败');
+  }
+}
+
+async function importSaveFile(file){
+  if (!file) return;
+
+  try{
+    const data = JSON.parse(await file.text());
+    if (!data || typeof data !== 'object' || Array.isArray(data)){
+      throw new Error('存档格式无效');
+    }
+    if (!SECTS.some(s => s.id === data.sect)){
+      throw new Error('存档缺少有效门派');
+    }
+    if (!applySaveData(data)){
+      throw new Error('存档内容无效');
+    }
+
+    if (!saveGame()){
+      throw new Error('导入后保存失败');
+    }
+    updateHUD();
+    renderWorld();
+    startGameLoop();
+    closeModal('modalChar');
+    toast('📥 存档已上传并读取');
+  }catch(err){
+    console.warn('上传存档失败：', err);
+    toast('上传存档失败，请选择有效的存档文件');
+  }
+}
+
+$('btnExportSave').addEventListener('click', exportSave);
+$('btnImportSave').addEventListener('click', () => $('saveFileInput').click());
+$('saveFileInput').addEventListener('change', e => {
+  const [file] = e.target.files;
+  importSaveFile(file);
+  e.target.value = '';
+});
+
 /* 点击遮罩关闭 */
 $$('.modal').forEach(m => {
   m.addEventListener('click', e => {
@@ -4659,15 +4728,7 @@ let gameLoopTimer = null;
 /* 保存游戏 */
 function saveGame(){
   try{
-    const data = {
-      name:P.name, sect:P.sect, lv:P.lv, exp:P.exp,
-      hp:P.hp, maxHp:P.maxHp, mp:P.mp, maxMp:P.maxMp,
-      atk:P.atk, def:P.def, spd:P.spd, magic:P.magic,
-      gold:P.gold, x:P.x, y:P.y, scene:P.scene, subScene:P.subScene,
-      bag:P.bag, pet:P.pet, petBox:P.petBox, steps:P.steps,
-      battles:P.battles, kills:P.kills, killStats:P.killStats, bankGold:P.bankGold,
-      logs:Array.isArray(P.logs) ? P.logs.slice(-50) : []
-    };
+    const data = getSaveData();
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     return true;
   }catch(err){
@@ -4676,43 +4737,59 @@ function saveGame(){
   }
 }
 
+function getSaveData(){
+  return {
+    name:P.name, sect:P.sect, lv:P.lv, exp:P.exp,
+    hp:P.hp, maxHp:P.maxHp, mp:P.mp, maxMp:P.maxMp,
+    atk:P.atk, def:P.def, spd:P.spd, magic:P.magic,
+    gold:P.gold, x:P.x, y:P.y, scene:P.scene, subScene:P.subScene,
+    bag:P.bag, pet:P.pet, petBox:P.petBox, steps:P.steps,
+    battles:P.battles, kills:P.kills, killStats:P.killStats, bankGold:P.bankGold,
+    logs:Array.isArray(P.logs) ? P.logs.slice(-50) : []
+  };
+}
+
+function applySaveData(data){
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
+
+  const allowed = [
+    'name','sect','lv','exp','hp','maxHp','mp','maxMp',
+    'atk','def','spd','magic','gold','x','y','scene','subScene',
+    'bag','pet','petBox','steps','battles','kills','killStats','bankGold','logs'
+  ];
+  allowed.forEach(key => {
+    if (Object.prototype.hasOwnProperty.call(data, key)) P[key] = data[key];
+  });
+
+  /* 防止旧存档或手工修改造成非法数值 */
+  P.lv = Math.max(1, Number(P.lv) || 1);
+  P.exp = Math.max(0, Number(P.exp) || 0);
+  P.maxHp = Math.max(1, Number(P.maxHp) || 100);
+  P.maxMp = Math.max(1, Number(P.maxMp) || 50);
+  P.hp = clamp(Number(P.hp) || P.maxHp, 0, P.maxHp);
+  P.mp = clamp(Number(P.mp) || P.maxMp, 0, P.maxMp);
+  P.gold = Math.max(0, Number(P.gold) || 0);
+  P.x = Number.isFinite(Number(P.x)) ? Number(P.x) : 0;
+  P.y = Number.isFinite(Number(P.y)) ? Number(P.y) : 0;
+  P.steps = Math.max(0, Number(P.steps) || 0);
+  P.battles = Math.max(0, Number(P.battles) || 0);
+  P.kills = Math.max(0, Number(P.kills) || 0);
+  P.bankGold = Math.max(0, Number(P.bankGold) || 0);
+  if (!P.killStats || typeof P.killStats !== 'object') P.killStats = {};
+  if (!P.bag || typeof P.bag !== 'object') P.bag = {};
+  if (!Array.isArray(P.petBox)) P.petBox = [];
+  if (!Array.isArray(P.logs)) P.logs = [];
+
+  return Boolean(P.sect);
+}
+
 /* 读取存档 */
 function loadGame(){
   try{
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return false;
     const data = JSON.parse(raw);
-    if (!data || typeof data !== 'object') return false;
-
-    const allowed = [
-      'name','sect','lv','exp','hp','maxHp','mp','maxMp',
-      'atk','def','spd','magic','gold','x','y','scene','subScene',
-      'bag','pet','petBox','steps','battles','kills','killStats','bankGold','logs'
-    ];
-    allowed.forEach(key => {
-      if (Object.prototype.hasOwnProperty.call(data, key)) P[key] = data[key];
-    });
-
-    /* 防止旧存档或手工修改造成非法数值 */
-    P.lv = Math.max(1, Number(P.lv) || 1);
-    P.exp = Math.max(0, Number(P.exp) || 0);
-    P.maxHp = Math.max(1, Number(P.maxHp) || 100);
-    P.maxMp = Math.max(1, Number(P.maxMp) || 50);
-    P.hp = clamp(Number(P.hp) || P.maxHp, 0, P.maxHp);
-    P.mp = clamp(Number(P.mp) || P.maxMp, 0, P.maxMp);
-    P.gold = Math.max(0, Number(P.gold) || 0);
-    P.x = Number.isFinite(Number(P.x)) ? Number(P.x) : 0;
-    P.y = Number.isFinite(Number(P.y)) ? Number(P.y) : 0;
-    P.steps = Math.max(0, Number(P.steps) || 0);
-    P.battles = Math.max(0, Number(P.battles) || 0);
-    P.kills = Math.max(0, Number(P.kills) || 0);
-    P.bankGold = Math.max(0, Number(P.bankGold) || 0);
-    if (!P.killStats || typeof P.killStats !== 'object') P.killStats = {};
-    if (!P.bag || typeof P.bag !== 'object') P.bag = {};
-    if (!Array.isArray(P.petBox)) P.petBox = [];
-    if (!Array.isArray(P.logs)) P.logs = [];
-
-    return Boolean(P.sect);
+    return applySaveData(data);
   }catch(err){
     console.warn('读取存档失败：', err);
     return false;
