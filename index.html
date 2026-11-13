@@ -2758,6 +2758,7 @@ const SCENES = [
 
 /* ================= 地形缓存 ================= */
 const tileCache = new Map();
+const TILE_CACHE_LIMIT = 5000;
 
 /* 判断某坐标属于哪个场景 */
 function getSceneAt(x, y){
@@ -2864,6 +2865,9 @@ function getTile(x, y){
   }
   
   tileCache.set(key, tile);
+  if (tileCache.size > TILE_CACHE_LIMIT){
+    tileCache.delete(tileCache.keys().next().value);
+  }
   return tile;
 }
 
@@ -2927,6 +2931,8 @@ function getMapMonster(x, y){
 
 /* ================= 怪物地图图片 ================= */
 function makeMonsterImage(mob){
+  if (makeMonsterImage.cache.has(mob.id)) return makeMonsterImage.cache.get(mob.id);
+
   // 使用内嵌 SVG 生成独立图片，不依赖网络图片地址，手机和电脑都能显示。
   const colors = {
     lang:['#6b4a2f','#d7a36b'], shanzei:['#5b3b25','#c88a4a'], liukou:['#3a2930','#9b5960'],
@@ -2943,8 +2949,11 @@ function makeMonsterImage(mob){
     `<text x=24 y=31 text-anchor=\"middle\" font-size=23 font-family=\"Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif\">${icon}</text>`+
     `<path d=\"M10 39h28\" stroke=\"#fff\" stroke-opacity=\".25\" stroke-width=2/>`+
     `</svg>`;
-  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+  const image = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+  makeMonsterImage.cache.set(mob.id, image);
+  return image;
 }
+makeMonsterImage.cache = new Map();
 
 /* ================= 渲染世界 ================= */
 let lastRenderX = null, lastRenderY = null;
