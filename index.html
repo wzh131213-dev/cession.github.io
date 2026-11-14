@@ -3304,21 +3304,19 @@ function onStep(x, y){
     updateHUD();
   }
   
-  // 遇敌概率
-  let encounterRate = 0.08;
-  if (scene) encounterRate += scene.danger * 0.012;
-  encounterRate = clamp(encounterRate, 0.05, 0.25);
-  
-  // 每走3步才检测一次（避免太快遇敌）
-  if (P.steps % 3 !== 0) return;
-  if (Math.random() > encounterRate) return;
-  
+  // 每走五步固定刷新一次怪物，不再使用随机遭遇概率。
+  if (P.steps % 5 !== 0) return;
+
+  // 刷新值：当前月份 + 日期，除以 2 后乘当前等级，再乘 10。
+  const now = new Date();
+  const refreshValue = ((now.getMonth() + 1 + now.getDate()) / 2) * P.lv * 10;
+
   // 触发战斗
-  startEncounter(scene);
+  startEncounter(scene, refreshValue);
 }
 
 /* ================= 触发遭遇战 ================= */
-function startEncounter(scene){
+function startEncounter(scene, refreshValue = 10){
   // 选择怪物
   let pool;
   if (!scene){
@@ -3335,8 +3333,8 @@ function startEncounter(scene){
     pool = ['lang'];
   }
   
-  // 随机数量
-  const count = Math.random() < 0.5 ? 1 : (Math.random() < 0.85 ? 2 : 3);
+  // 刷新值每达到 100 增加一个怪物，最多同时刷新 3 个。
+  const count = clamp(Math.floor(refreshValue / 100), 1, 3);
   const mobs = [];
   for (let i = 0; i < count; i++){
     const id = pool[Math.floor(Math.random() * pool.length)];
