@@ -146,8 +146,15 @@ html,body{
     0 2px 5px rgba(0,0,0,.5);
   display:flex;align-items:flex-end;justify-content:center;
   overflow:hidden;position:relative;
+  cursor:pointer;
 }
 #portrait svg{width:100%;height:100%;display:block}
+#portrait img{
+  width:100%;height:100%;display:none;
+  object-fit:cover;
+}
+#portrait.avatar-frog svg{display:none}
+#portrait.avatar-frog img{display:block}
 #portrait::after{
   content:'';position:absolute;left:0;right:0;bottom:0;height:3px;
   background:linear-gradient(90deg,transparent,var(--gold),transparent);
@@ -471,6 +478,13 @@ html,body{
   transition:left .12s linear,top .12s linear;
 }
 #player svg{width:100%;height:100%;display:block}
+#player img{
+  width:100%;height:100%;display:none;
+  object-fit:cover;
+  image-rendering:auto;
+}
+#player.avatar-frog svg{display:none}
+#player.avatar-frog img{display:block}
 #player.walking{
   animation:playerWalk .35s steps(2) infinite;
 }
@@ -988,6 +1002,32 @@ html,body{
   cursor:not-allowed;
   opacity:.6;
 }
+
+.avatar-choice{
+  min-width:0;
+  padding:10px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:#ffe8a0;
+  background:linear-gradient(180deg,rgba(138,82,40,.75),rgba(58,31,14,.9));
+  border:2px solid rgba(240,200,96,.25);
+  border-radius:8px;
+  cursor:pointer;
+}
+.avatar-choice.selected{
+  border-color:var(--gold);
+  box-shadow:0 0 12px rgba(240,200,96,.35),inset 0 0 12px rgba(240,200,96,.12);
+}
+.avatar-preview{
+  width:92px;height:104px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  background:#1a0e08;
+  border:1px solid rgba(240,200,96,.35);
+  border-radius:5px;
+}
+.avatar-preview svg{width:72px;height:90px}
+.avatar-preview img{width:100%;height:100%;object-fit:cover}
+.avatar-choice-name{font-size:12px;font-weight:bold}
 /* 主按钮（金色） */
 .btn.primary{
   background:
@@ -1491,7 +1531,7 @@ button{
   
   <!-- ============ 顶部状态栏 ============ -->
   <header id="topbar">
-    <div id="portrait">
+    <div id="portrait" title="点击更换人物形象">
       <svg viewBox="0 0 16 18" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
         <!-- 头发 -->
         <rect x="4" y="0" width="8" height="2" fill="#2a1620"/>
@@ -1534,6 +1574,7 @@ button{
         <rect x="4" y="13" width="1" height="1" fill="#c8a860"/>
         <rect x="11" y="13" width="1" height="1" fill="#c8a860"/>
       </svg>
+      <img src="assets/frog-avatar.jpg" alt="青蛙人物形象">
     </div>
     
     <div class="info-mid">
@@ -1621,6 +1662,20 @@ button{
       <div class="dialog-head">
         <div class="dialog-title">人 物</div>
         <button class="dialog-close" data-close="modalChar">✕</button>
+      </div>
+
+      <!-- 人物形象选择 -->
+      <div class="modal" id="modalAvatar">
+        <div class="dialog">
+          <div class="dialog-head">
+            <div class="dialog-title">人物形象</div>
+            <button class="dialog-close" data-close="modalAvatar">✕</button>
+          </div>
+          <div class="dialog-body" id="avatarBody"></div>
+          <div class="dialog-foot">
+            <button class="btn primary" data-close="modalAvatar">关 闭</button>
+          </div>
+        </div>
       </div>
       <div class="dialog-body" id="charBody"></div>
       <div class="dialog-foot">
@@ -1920,6 +1975,7 @@ const P = {
   quest: null,
   questDone: 0,
   flags: {},
+  avatar: 'original',
 };
 
 /* 经验公式 */
@@ -2065,6 +2121,7 @@ function chooseSect(id){
    HUD 更新
    ============================================================ */
 function updateHUD(){
+  renderAvatar();
   $('pName').textContent = P.name;
   const sect = SECTS.find(s => s.id === P.sect);
   $('pSect').textContent = sect ? sect.name : '无门无派';
@@ -2196,6 +2253,49 @@ $$('.modal').forEach(m => {
       m.classList.remove('show');
     }
   });
+});
+
+/* 人物形象选择 */
+function renderAvatar(){
+  const portrait = $('portrait');
+  if (portrait) portrait.classList.toggle('avatar-frog', P.avatar === 'frog');
+  const player = $('player');
+  if (player) player.classList.toggle('avatar-frog', P.avatar === 'frog');
+}
+
+function setAvatar(avatar){
+  P.avatar = avatar === 'frog' ? 'frog' : 'original';
+  renderAvatar();
+  saveGame();
+  renderAvatarPanel();
+  toast(P.avatar === 'frog' ? '🐸 已换上青蛙形象' : '🧝 已换回原本形象');
+}
+
+function renderAvatarPanel(){
+  const body = $('avatarBody');
+  if (!body) return;
+  const originalSvg = $('portrait').querySelector('svg').outerHTML;
+  body.innerHTML = `
+    <div style="text-align:center;color:#c0a870;margin-bottom:12px">选择你的人物形象</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="avatar-choice ${P.avatar === 'original' ? 'selected' : ''}" data-avatar="original">
+        <span class="avatar-preview original">${originalSvg}</span>
+        <span class="avatar-choice-name">原本形象</span>
+      </button>
+      <button class="avatar-choice ${P.avatar === 'frog' ? 'selected' : ''}" data-avatar="frog">
+        <span class="avatar-preview"><img src="assets/frog-avatar.jpg" alt="青蛙人物形象"></span>
+        <span class="avatar-choice-name">青蛙形象</span>
+      </button>
+    </div>
+  `;
+  body.querySelectorAll('[data-avatar]').forEach(btn => {
+    btn.addEventListener('click', () => setAvatar(btn.dataset.avatar));
+  });
+}
+
+$('portrait').addEventListener('click', () => {
+  renderAvatarPanel();
+  openModal('modalAvatar');
 });
 
 /* ============================================================
@@ -3107,10 +3207,12 @@ function renderPlayer(vw, vh){
         <rect x="3" y="19" width="4" height="1" fill="#2a1a10"/>
         <rect x="9" y="19" width="4" height="1" fill="#2a1a10"/>
       </svg>
+      <img src="assets/frog-avatar.jpg" alt="青蛙人物形象">
     `;
     stage.appendChild(pEl);
   }
   
+  pEl.classList.toggle('avatar-frog', P.avatar === 'frog');
   pEl.style.left = px + 'px';
   pEl.style.top  = py + 'px';
 }
@@ -4748,7 +4850,7 @@ function saveGame(){
 
 function getSaveData(){
   return {
-    name:P.name, sect:P.sect, lv:P.lv, exp:P.exp,
+    name:P.name, sect:P.sect, avatar:P.avatar, lv:P.lv, exp:P.exp,
     hp:P.hp, maxHp:P.maxHp, mp:P.mp, maxMp:P.maxMp,
     atk:P.atk, def:P.def, spd:P.spd, magic:P.magic,
     gold:P.gold, x:P.x, y:P.y, scene:P.scene, subScene:P.subScene,
@@ -4762,13 +4864,14 @@ function applySaveData(data){
   if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
 
   const allowed = [
-    'name','sect','lv','exp','hp','maxHp','mp','maxMp',
+    'name','sect','avatar','lv','exp','hp','maxHp','mp','maxMp',
     'atk','def','spd','magic','gold','x','y','scene','subScene',
     'bag','pet','petBox','steps','battles','kills','killStats','bankGold','logs'
   ];
   allowed.forEach(key => {
     if (Object.prototype.hasOwnProperty.call(data, key)) P[key] = data[key];
   });
+  P.avatar = P.avatar === 'frog' ? 'frog' : 'original';
 
   /* 防止旧存档或手工修改造成非法数值 */
   P.lv = Math.max(1, Number(P.lv) || 1);
