@@ -146,8 +146,15 @@ html,body{
     0 2px 5px rgba(0,0,0,.5);
   display:flex;align-items:flex-end;justify-content:center;
   overflow:hidden;position:relative;
+  cursor:pointer;
 }
 #portrait svg{width:100%;height:100%;display:block}
+#portrait img{
+  width:100%;height:100%;display:none;
+  object-fit:cover;
+}
+#portrait.avatar-frog svg{display:none}
+#portrait.avatar-frog img{display:block}
 #portrait::after{
   content:'';position:absolute;left:0;right:0;bottom:0;height:3px;
   background:linear-gradient(90deg,transparent,var(--gold),transparent);
@@ -471,6 +478,13 @@ html,body{
   transition:left .12s linear,top .12s linear;
 }
 #player svg{width:100%;height:100%;display:block}
+#player img{
+  width:100%;height:100%;display:none;
+  object-fit:cover;
+  image-rendering:auto;
+}
+#player.avatar-frog svg{display:none}
+#player.avatar-frog img{display:block}
 #player.walking{
   animation:playerWalk .35s steps(2) infinite;
 }
@@ -988,6 +1002,32 @@ html,body{
   cursor:not-allowed;
   opacity:.6;
 }
+
+.avatar-choice{
+  min-width:0;
+  padding:10px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:#ffe8a0;
+  background:linear-gradient(180deg,rgba(138,82,40,.75),rgba(58,31,14,.9));
+  border:2px solid rgba(240,200,96,.25);
+  border-radius:8px;
+  cursor:pointer;
+}
+.avatar-choice.selected{
+  border-color:var(--gold);
+  box-shadow:0 0 12px rgba(240,200,96,.35),inset 0 0 12px rgba(240,200,96,.12);
+}
+.avatar-preview{
+  width:92px;height:104px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  background:#1a0e08;
+  border:1px solid rgba(240,200,96,.35);
+  border-radius:5px;
+}
+.avatar-preview svg{width:72px;height:90px}
+.avatar-preview img{width:100%;height:100%;object-fit:cover}
+.avatar-choice-name{font-size:12px;font-weight:bold}
 /* 主按钮（金色） */
 .btn.primary{
   background:
@@ -1491,7 +1531,7 @@ button{
   
   <!-- ============ 顶部状态栏 ============ -->
   <header id="topbar">
-    <div id="portrait">
+    <div id="portrait" title="点击更换人物形象">
       <svg viewBox="0 0 16 18" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
         <!-- 头发 -->
         <rect x="4" y="0" width="8" height="2" fill="#2a1620"/>
@@ -1534,6 +1574,7 @@ button{
         <rect x="4" y="13" width="1" height="1" fill="#c8a860"/>
         <rect x="11" y="13" width="1" height="1" fill="#c8a860"/>
       </svg>
+      <img src="assets/frog-avatar.jpg" alt="青蛙人物形象">
     </div>
     
     <div class="info-mid">
@@ -1622,8 +1663,24 @@ button{
         <div class="dialog-title">人 物</div>
         <button class="dialog-close" data-close="modalChar">✕</button>
       </div>
+
+      <!-- 人物形象选择 -->
+      <div class="modal" id="modalAvatar">
+        <div class="dialog">
+          <div class="dialog-head">
+            <div class="dialog-title">人物形象</div>
+            <button class="dialog-close" data-close="modalAvatar">✕</button>
+          </div>
+          <div class="dialog-body" id="avatarBody"></div>
+          <div class="dialog-foot">
+            <button class="btn primary" data-close="modalAvatar">关 闭</button>
+          </div>
+        </div>
+      </div>
       <div class="dialog-body" id="charBody"></div>
       <div class="dialog-foot">
+        <button class="btn" id="btnExportSave">下载存档</button>
+        <button class="btn" id="btnImportSave">上传存档</button>
         <button class="btn primary" data-close="modalChar">关 闭</button>
       </div>
     </div>
@@ -1697,6 +1754,7 @@ button{
       </div>
     </div>
   </div>
+  <input id="saveFileInput" type="file" accept=".json,application/json" hidden>
 
 <script>
 /* ============================================================
@@ -1917,6 +1975,7 @@ const P = {
   quest: null,
   questDone: 0,
   flags: {},
+  avatar: 'original',
 };
 
 /* 经验公式 */
@@ -2062,6 +2121,7 @@ function chooseSect(id){
    HUD 更新
    ============================================================ */
 function updateHUD(){
+  renderAvatar();
   $('pName').textContent = P.name;
   const sect = SECTS.find(s => s.id === P.sect);
   $('pSect').textContent = sect ? sect.name : '无门无派';
@@ -2120,6 +2180,72 @@ document.addEventListener('click', e => {
     closeModal(closeTarget.dataset.close);
   }
 });
+
+/* 存档导入导出 */
+function exportSave(){
+  if (!saveGame()){
+    toast('存档失败，无法下载');
+    return;
+  }
+
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) throw new Error('没有可导出的存档');
+
+    const blob = new Blob([raw], {type:'application/json;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    link.href = url;
+    link.download = `梦幻西游存档-${stamp}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    toast('💾 存档已下载');
+  }catch(err){
+    console.warn('下载存档失败：', err);
+    toast('下载存档失败');
+  }
+}
+
+async function importSaveFile(file){
+  if (!file) return;
+
+  try{
+    const data = JSON.parse(await file.text());
+    if (!data || typeof data !== 'object' || Array.isArray(data)){
+      throw new Error('存档格式无效');
+    }
+    if (!SECTS.some(s => s.id === data.sect)){
+      throw new Error('存档缺少有效门派');
+    }
+    if (!applySaveData(data)){
+      throw new Error('存档内容无效');
+    }
+
+    if (!saveGame()){
+      throw new Error('导入后保存失败');
+    }
+    updateHUD();
+    renderWorld();
+    startGameLoop();
+    closeModal('modalChar');
+    toast('📥 存档已上传并读取');
+  }catch(err){
+    console.warn('上传存档失败：', err);
+    toast('上传存档失败，请选择有效的存档文件');
+  }
+}
+
+$('btnExportSave').addEventListener('click', exportSave);
+$('btnImportSave').addEventListener('click', () => $('saveFileInput').click());
+$('saveFileInput').addEventListener('change', e => {
+  const [file] = e.target.files;
+  importSaveFile(file);
+  e.target.value = '';
+});
+
 /* 点击遮罩关闭 */
 $$('.modal').forEach(m => {
   m.addEventListener('click', e => {
@@ -2127,6 +2253,49 @@ $$('.modal').forEach(m => {
       m.classList.remove('show');
     }
   });
+});
+
+/* 人物形象选择 */
+function renderAvatar(){
+  const portrait = $('portrait');
+  if (portrait) portrait.classList.toggle('avatar-frog', P.avatar === 'frog');
+  const player = $('player');
+  if (player) player.classList.toggle('avatar-frog', P.avatar === 'frog');
+}
+
+function setAvatar(avatar){
+  P.avatar = avatar === 'frog' ? 'frog' : 'original';
+  renderAvatar();
+  saveGame();
+  renderAvatarPanel();
+  toast(P.avatar === 'frog' ? '🐸 已换上青蛙形象' : '🧝 已换回原本形象');
+}
+
+function renderAvatarPanel(){
+  const body = $('avatarBody');
+  if (!body) return;
+  const originalSvg = $('portrait').querySelector('svg').outerHTML;
+  body.innerHTML = `
+    <div style="text-align:center;color:#c0a870;margin-bottom:12px">选择你的人物形象</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="avatar-choice ${P.avatar === 'original' ? 'selected' : ''}" data-avatar="original">
+        <span class="avatar-preview original">${originalSvg}</span>
+        <span class="avatar-choice-name">原本形象</span>
+      </button>
+      <button class="avatar-choice ${P.avatar === 'frog' ? 'selected' : ''}" data-avatar="frog">
+        <span class="avatar-preview"><img src="assets/frog-avatar.jpg" alt="青蛙人物形象"></span>
+        <span class="avatar-choice-name">青蛙形象</span>
+      </button>
+    </div>
+  `;
+  body.querySelectorAll('[data-avatar]').forEach(btn => {
+    btn.addEventListener('click', () => setAvatar(btn.dataset.avatar));
+  });
+}
+
+$('portrait').addEventListener('click', () => {
+  renderAvatarPanel();
+  openModal('modalAvatar');
 });
 
 /* ============================================================
@@ -2689,6 +2858,7 @@ const SCENES = [
 
 /* ================= 地形缓存 ================= */
 const tileCache = new Map();
+const TILE_CACHE_LIMIT = 5000;
 
 /* 判断某坐标属于哪个场景 */
 function getSceneAt(x, y){
@@ -2795,6 +2965,9 @@ function getTile(x, y){
   }
   
   tileCache.set(key, tile);
+  if (tileCache.size > TILE_CACHE_LIMIT){
+    tileCache.delete(tileCache.keys().next().value);
+  }
   return tile;
 }
 
@@ -2858,6 +3031,8 @@ function getMapMonster(x, y){
 
 /* ================= 怪物地图图片 ================= */
 function makeMonsterImage(mob){
+  if (makeMonsterImage.cache.has(mob.id)) return makeMonsterImage.cache.get(mob.id);
+
   // 使用内嵌 SVG 生成独立图片，不依赖网络图片地址，手机和电脑都能显示。
   const colors = {
     lang:['#6b4a2f','#d7a36b'], shanzei:['#5b3b25','#c88a4a'], liukou:['#3a2930','#9b5960'],
@@ -2874,8 +3049,11 @@ function makeMonsterImage(mob){
     `<text x=24 y=31 text-anchor=\"middle\" font-size=23 font-family=\"Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif\">${icon}</text>`+
     `<path d=\"M10 39h28\" stroke=\"#fff\" stroke-opacity=\".25\" stroke-width=2/>`+
     `</svg>`;
-  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+  const image = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+  makeMonsterImage.cache.set(mob.id, image);
+  return image;
 }
+makeMonsterImage.cache = new Map();
 
 /* ================= 渲染世界 ================= */
 let lastRenderX = null, lastRenderY = null;
@@ -3029,10 +3207,12 @@ function renderPlayer(vw, vh){
         <rect x="3" y="19" width="4" height="1" fill="#2a1a10"/>
         <rect x="9" y="19" width="4" height="1" fill="#2a1a10"/>
       </svg>
+      <img src="assets/frog-avatar.jpg" alt="青蛙人物形象">
     `;
     stage.appendChild(pEl);
   }
   
+  pEl.classList.toggle('avatar-frog', P.avatar === 'frog');
   pEl.style.left = px + 'px';
   pEl.style.top  = py + 'px';
 }
@@ -3124,21 +3304,19 @@ function onStep(x, y){
     updateHUD();
   }
   
-  // 遇敌概率
-  let encounterRate = 0.08;
-  if (scene) encounterRate += scene.danger * 0.012;
-  encounterRate = clamp(encounterRate, 0.05, 0.25);
-  
-  // 每走3步才检测一次（避免太快遇敌）
-  if (P.steps % 3 !== 0) return;
-  if (Math.random() > encounterRate) return;
-  
+  // 每走五步固定刷新一次怪物，不再使用随机遭遇概率。
+  if (P.steps % 5 !== 0) return;
+
+  // 刷新值：当前月份 + 日期，除以 2 后乘当前等级，再乘 10。
+  const now = new Date();
+  const refreshValue = ((now.getMonth() + 1 + now.getDate()) / 2) * P.lv * 10;
+
   // 触发战斗
-  startEncounter(scene);
+  startEncounter(scene, refreshValue);
 }
 
 /* ================= 触发遭遇战 ================= */
-function startEncounter(scene){
+function startEncounter(scene, refreshValue = 10){
   // 选择怪物
   let pool;
   if (!scene){
@@ -3155,8 +3333,8 @@ function startEncounter(scene){
     pool = ['lang'];
   }
   
-  // 随机数量
-  const count = Math.random() < 0.5 ? 1 : (Math.random() < 0.85 ? 2 : 3);
+  // 刷新值每达到 100 增加一个怪物，最多同时刷新 3 个。
+  const count = clamp(Math.floor(refreshValue / 100), 1, 3);
   const mobs = [];
   for (let i = 0; i < count; i++){
     const id = pool[Math.floor(Math.random() * pool.length)];
@@ -4659,15 +4837,7 @@ let gameLoopTimer = null;
 /* 保存游戏 */
 function saveGame(){
   try{
-    const data = {
-      name:P.name, sect:P.sect, lv:P.lv, exp:P.exp,
-      hp:P.hp, maxHp:P.maxHp, mp:P.mp, maxMp:P.maxMp,
-      atk:P.atk, def:P.def, spd:P.spd, magic:P.magic,
-      gold:P.gold, x:P.x, y:P.y, scene:P.scene, subScene:P.subScene,
-      bag:P.bag, pet:P.pet, petBox:P.petBox, steps:P.steps,
-      battles:P.battles, kills:P.kills, killStats:P.killStats, bankGold:P.bankGold,
-      logs:Array.isArray(P.logs) ? P.logs.slice(-50) : []
-    };
+    const data = getSaveData();
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     return true;
   }catch(err){
@@ -4676,43 +4846,60 @@ function saveGame(){
   }
 }
 
+function getSaveData(){
+  return {
+    name:P.name, sect:P.sect, avatar:P.avatar, lv:P.lv, exp:P.exp,
+    hp:P.hp, maxHp:P.maxHp, mp:P.mp, maxMp:P.maxMp,
+    atk:P.atk, def:P.def, spd:P.spd, magic:P.magic,
+    gold:P.gold, x:P.x, y:P.y, scene:P.scene, subScene:P.subScene,
+    bag:P.bag, pet:P.pet, petBox:P.petBox, steps:P.steps,
+    battles:P.battles, kills:P.kills, killStats:P.killStats, bankGold:P.bankGold,
+    logs:Array.isArray(P.logs) ? P.logs.slice(-50) : []
+  };
+}
+
+function applySaveData(data){
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
+
+  const allowed = [
+    'name','sect','avatar','lv','exp','hp','maxHp','mp','maxMp',
+    'atk','def','spd','magic','gold','x','y','scene','subScene',
+    'bag','pet','petBox','steps','battles','kills','killStats','bankGold','logs'
+  ];
+  allowed.forEach(key => {
+    if (Object.prototype.hasOwnProperty.call(data, key)) P[key] = data[key];
+  });
+  P.avatar = P.avatar === 'frog' ? 'frog' : 'original';
+
+  /* 防止旧存档或手工修改造成非法数值 */
+  P.lv = Math.max(1, Number(P.lv) || 1);
+  P.exp = Math.max(0, Number(P.exp) || 0);
+  P.maxHp = Math.max(1, Number(P.maxHp) || 100);
+  P.maxMp = Math.max(1, Number(P.maxMp) || 50);
+  P.hp = clamp(Number(P.hp) || P.maxHp, 0, P.maxHp);
+  P.mp = clamp(Number(P.mp) || P.maxMp, 0, P.maxMp);
+  P.gold = Math.max(0, Number(P.gold) || 0);
+  P.x = Number.isFinite(Number(P.x)) ? Number(P.x) : 0;
+  P.y = Number.isFinite(Number(P.y)) ? Number(P.y) : 0;
+  P.steps = Math.max(0, Number(P.steps) || 0);
+  P.battles = Math.max(0, Number(P.battles) || 0);
+  P.kills = Math.max(0, Number(P.kills) || 0);
+  P.bankGold = Math.max(0, Number(P.bankGold) || 0);
+  if (!P.killStats || typeof P.killStats !== 'object') P.killStats = {};
+  if (!P.bag || typeof P.bag !== 'object') P.bag = {};
+  if (!Array.isArray(P.petBox)) P.petBox = [];
+  if (!Array.isArray(P.logs)) P.logs = [];
+
+  return Boolean(P.sect);
+}
+
 /* 读取存档 */
 function loadGame(){
   try{
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return false;
     const data = JSON.parse(raw);
-    if (!data || typeof data !== 'object') return false;
-
-    const allowed = [
-      'name','sect','lv','exp','hp','maxHp','mp','maxMp',
-      'atk','def','spd','magic','gold','x','y','scene','subScene',
-      'bag','pet','petBox','steps','battles','kills','killStats','bankGold','logs'
-    ];
-    allowed.forEach(key => {
-      if (Object.prototype.hasOwnProperty.call(data, key)) P[key] = data[key];
-    });
-
-    /* 防止旧存档或手工修改造成非法数值 */
-    P.lv = Math.max(1, Number(P.lv) || 1);
-    P.exp = Math.max(0, Number(P.exp) || 0);
-    P.maxHp = Math.max(1, Number(P.maxHp) || 100);
-    P.maxMp = Math.max(1, Number(P.maxMp) || 50);
-    P.hp = clamp(Number(P.hp) || P.maxHp, 0, P.maxHp);
-    P.mp = clamp(Number(P.mp) || P.maxMp, 0, P.maxMp);
-    P.gold = Math.max(0, Number(P.gold) || 0);
-    P.x = Number.isFinite(Number(P.x)) ? Number(P.x) : 0;
-    P.y = Number.isFinite(Number(P.y)) ? Number(P.y) : 0;
-    P.steps = Math.max(0, Number(P.steps) || 0);
-    P.battles = Math.max(0, Number(P.battles) || 0);
-    P.kills = Math.max(0, Number(P.kills) || 0);
-    P.bankGold = Math.max(0, Number(P.bankGold) || 0);
-    if (!P.killStats || typeof P.killStats !== 'object') P.killStats = {};
-    if (!P.bag || typeof P.bag !== 'object') P.bag = {};
-    if (!Array.isArray(P.petBox)) P.petBox = [];
-    if (!Array.isArray(P.logs)) P.logs = [];
-
-    return Boolean(P.sect);
+    return applySaveData(data);
   }catch(err){
     console.warn('读取存档失败：', err);
     return false;
